@@ -52,12 +52,15 @@ import { dictApi } from '/@/api/support/dict-api.js';
  */
 async function getLoginInfo() {
   try {
-    //获取登录用户信息
+    //获取登录用户信息  1. 调用接口获取登录用户信息（包含菜单列表等）
     const res = await loginApi.getLoginInfo();
+    // 2. 调用接口获取所有数据字典（如下拉框选项等全局静态数据）
     const dictRes = await dictApi.getAllDictData();
     //构建系统的路由
     let menuRouterList = res.data.menuList.filter((e) => e.path || e.frameUrl);
+    // 4. 调用路由配置中的 buildRoutes 函数，根据菜单列表生成动态路由
     buildRoutes(menuRouterList);
+    // 5. 初始化 Vue 应用（挂载根组件等）
     initVue();
     // 初始化数据字典
     useDictStore().initData(dictRes.data);
@@ -71,20 +74,21 @@ async function getLoginInfo() {
 }
 
 async function initVue() {
+  //创建 Vue 应用实例（传入根组件 App.vue）
   let vueApp = createApp(App);
   let app = vueApp
-    .use(router)
-    .use(store)
-    .use(i18n)
-    .use(Antd)
-    .use(smartEnumPlugin, constantsInfo)
-    .use(privilegePlugin)
-    .use(dictPlugin)
-    .use(JsonViewer);
-  //注入权限
+    .use(router)  // 安装路由插件（router/index.js 中创建的路由实例）
+    .use(store) // 安装 Pinia 状态管理（store/index.js 中创建的 store 实例）
+    .use(i18n) // 安装国际化插件（处理多语言）
+    .use(Antd) // 安装 Ant Design Vue 组件库
+    .use(smartEnumPlugin, constantsInfo)  // 安装自定义枚举插件（传入常量配置）
+    .use(privilegePlugin) //安装权限插件（控制按钮/菜单权限）
+    .use(dictPlugin) // 安装数据字典插件（全局使用字典数据）
+    .use(JsonViewer); // 安装 JSON 查看器插件
+  //注入权限 3. 注册全局权限指令（v-privilege，用于控制元素显示权限）
   app.directive('privilege', {
     mounted(el, binding) {
-      privilegeDirective(el, binding);
+      privilegeDirective(el, binding); // 调用权限指令的实现逻辑
     },
   });
   // 注册图标组件
@@ -97,6 +101,14 @@ async function initVue() {
   //挂载
   app.mount('#app');
 }
+
+/**
+ * main.js 是 Vue 项目的入口文件，相当于整个应用的 “启动器” 
+ * 创建 Vue 实例，安装路由、状态管理、UI 组件库等核心依赖
+ * main.js 是默认的入口文件，构建工具（如 Vite）会自动将其作为程序的起点加载并执行。
+ * Vite 会从 main.js 开始解析代码，执行其中的逻辑（创建应用、挂载组件等），最终在浏览器中渲染页面。
+*/
+
 //不需要获取用户信息、用户菜单、用户菜单动态路由，直接初始化vue即可
 let token = localRead(LocalStorageKeyConst.USER_TOKEN);
 if (!token) {
