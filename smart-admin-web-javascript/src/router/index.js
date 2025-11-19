@@ -20,14 +20,19 @@ import { localClear, localRead } from '/@/utils/local-util';
 import _ from 'lodash';
 import LocalStorageKeyConst from '/@/constants/local-storage-key-const.js';
 
+//createRouter Vue Router 提供的核心函数，用于创建路由实例，接收一个配置对象作为参数。export const router：将创建的路由实例导出，供其他文件（如 main.js）引入并挂载到 Vue 应用中，使整个应用启用路由功能。
 export const router = createRouter({
-  history: createWebHashHistory(),
-  routes: routerArray,
-  strict: true,
-  scrollBehavior: () => ({ left: 0, top: 0 }),
+  history: createWebHashHistory(), //使用 Hash 模式的路由（URL 中包含 # 符号，如 http://example.com/#/login）。
+  routes: routerArray, //指定路由规则的数组，是路由实例的核心配置，定义了 “路径 -> 组件” 的映射关系。
+  strict: true,//设为 true 时，路由匹配会区分路径末尾的斜杠（/）。例如 /login 和 /login/ 会被视为两个不同的路径。
+  scrollBehavior: () => ({ left: 0, top: 0 }),//定义路由跳转时页面的滚动行为，是一个函数，返回值控制滚动位置。每次路由跳转后，页面自动滚动到左上角（x=0，y=0），避免因前一个页面滚动到下方，导致新页面加载时停留在滚动位置的问题，提升用户体验。
 });
 
 // ----------------------- 路由加载前 -----------------------
+//这段代码是 Vue Router 的全局前置导航守卫（beforeEach），作用是在每次路由跳转前拦截请求，执行登录验证、权限控制、页面配置等逻辑
+/**to：即将跳转的目标路由对象（包含路径、参数、元信息等）。
+from：当前即将离开的路由对象。
+next：函数，用于控制路由跳转流程（必须调用，否则路由会卡住）。 */
 router.beforeEach(async (to, from, next) => {
   // 进度条开启
   nProgress.start();
@@ -38,19 +43,26 @@ router.beforeEach(async (to, from, next) => {
     return;
   }
 
+  /**
+   * 通过 localRead 读取本地存储的 USER_TOKEN（登录凭证），判断用户是否已登录。
+   * 
+   */
   // 验证登录
   const token = localRead(LocalStorageKeyConst.USER_TOKEN);
   if (!token) {
+    //调用 useUserStore().logout() 清除可能残留的用户状态。
     useUserStore().logout();
     if (to.path === PAGE_PATH_LOGIN) {
+      //若用户已在登录页，则允许继续加载（避免无限跳转循环）。
       next();
     } else {
+      //若用户当前访问的不是登录页，强制重定向到 PAGE_PATH_LOGIN（登录页路径，如 /login）
       next({ path: PAGE_PATH_LOGIN });
     }
     return;
   }
 
-  // 登录页，则跳转到首页
+  // 登录页，则跳转到首页。 若已登录却访问登录页，则自动跳转到首页
   if (to.path === PAGE_PATH_LOGIN) {
     next({ path: HOME_PAGE_PATH });
     return;

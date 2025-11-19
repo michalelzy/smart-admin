@@ -9,7 +9,7 @@
 
     <name>sa-parent</name>
     <description>SmartAdmin project</description>
-
+<!--    sa-base 和 sa-admin。这意味着项目根目录下必须存在这两个子模块的文件夹，且每个子模块下都有自己的 pom.xml-->
 	<modules>
         <module>sa-base</module>
 		<module>sa-admin</module>
