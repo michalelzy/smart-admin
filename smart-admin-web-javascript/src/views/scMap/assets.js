@@ -36,6 +36,7 @@ export class Assets {
 
     // 资源加载
     let base_url = import.meta.env.BASE_URL
+    console.log('base_url is', base_url);
     let assets = [
       { type: "Texture", name: "flyline", path: pathLine },
       { type: "Texture", name: "pathLine", path: pathLine },

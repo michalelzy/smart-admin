@@ -23,7 +23,7 @@
   </div>
 </template>
 <script setup>
-import mCountTo from "@/components/mCountTo/index.js"
+import mCountTo from "/@/components/mCountTo/index.js"
 defineProps({
   info: {
     type: Object,

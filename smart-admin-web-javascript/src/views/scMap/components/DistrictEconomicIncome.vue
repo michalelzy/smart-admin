@@ -8,7 +8,7 @@
 <script setup>
 import { ref, onMounted,onBeforeUnmount, nextTick } from "vue"
 import * as echarts from "echarts"
-import mCard from "@/components/mCard/index.vue"
+import mCard from "/@/components/mCard/index.vue"
 import VChart from "vue-echarts"
 const option = ref({
   title: {

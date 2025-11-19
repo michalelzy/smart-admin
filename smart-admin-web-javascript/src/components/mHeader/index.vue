@@ -55,7 +55,7 @@
   </div>
 </template>
 <script setup>
-import mSvglineAnimation from "@/components/mSvglineAnimation/index.vue"
+import mSvglineAnimation from "/@/components/mSvglineAnimation/index.vue"
 defineProps({
   title: {
     type: String,

@@ -11,11 +11,11 @@
 import * as THREE from "three"
 import gsap from "gsap"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { emptyObject } from "@/mini3d"
+import { emptyObject } from "/@/mini3d"
 
-import ring2 from "@/assets/texture/pie/ring2.png"
-import ring3 from "@/assets/texture/pie/ring3.png"
-import ring4 from "@/assets/texture/pie/ring4.png"
+import ring2 from "/@/assets/texture/pie/ring2.png"
+import ring3 from "/@/assets/texture/pie/ring3.png"
+import ring4 from "/@/assets/texture/pie/ring4.png"
 export default {
   name: "ThreePie",
   props: {

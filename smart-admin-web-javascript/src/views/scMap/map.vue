@@ -6,8 +6,8 @@
 
 <script setup>
 
-import { onMounted, shallowRef, onBeforeMount } from 'vue';
-import { World} from "./maps.js";
+import { onMounted, shallowRef, onBeforeUnmount } from 'vue';
+import { World} from "./map.js";
 import emitter from "/@/utils/emitter";
 
 /**

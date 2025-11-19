@@ -20,7 +20,7 @@
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from "vue"
 import * as echarts from "echarts"
-import mCard from "@/components/mCard/index.vue"
+import mCard from "/@/components/mCard/index.vue"
 import VChart from "vue-echarts"
 
 const state = reactive({

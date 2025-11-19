@@ -44,9 +44,9 @@
 </template>
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from "vue"
-import mCard from "@/components/mCard/index.vue"
-import mPie from "@/components/mPie/index.vue"
-import mCountTo from "@/components/mCountTo/index.js"
+import mCard from "/@/components/mCard/index.vue"
+import mPie from "/@/components/mPie/index.vue"
+import mCountTo from "/@/components/mCountTo/index.js"
 
 const pie = ref(null)
 const state = reactive({

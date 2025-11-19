@@ -42,6 +42,7 @@ import {
     Label3d,
     Plane,
     Particles,
+    Focus,
 } from "/@/mini3d/components"
 
 import {
@@ -54,6 +55,7 @@ import labelIcon from "/@/assets/texture/label-icon.png";
 import chinaData from "./map/chinaData";
 import provincesData from "./map/provincesData";
 import scatterData from "./map/infoData";
+import infoData from "./map/infoData";
 import gsap from "gsap";
 import emitter from "/@/utils/emitter";
 import { InteractionManager } from "three.interactive";

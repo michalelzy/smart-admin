@@ -10,6 +10,8 @@
 import { resolve } from 'path';
 import vue from '@vitejs/plugin-vue';
 import customVariables from '/@/theme/custom-variables.js';
+import { defineConfig, loadEnv } from 'vite';
+import path from "path";
 
 // 定义路径解析函数：将相对路径转换为绝对路径。pathResolve 函数的核心作用是将相对路径安全、准确地转换为绝对路径，这是前端工程化中处理文件路径的基础操作，不做这一步会导致路径解析混乱、跨环境报错等问题。
 const pathResolve = (dir) => {
@@ -31,6 +33,14 @@ export default {
       {
         find: /\/@\//, // 匹配以 "/@/" 开头的路径（正则表达式，确保精确匹配）
         replacement: pathResolve('src') + '/', // 替换为项目中 src 目录的绝对路径 + 斜杠
+      },
+      {
+        find: '@/',
+        replacement: pathResolve('src') + '/',
+      },
+      {
+        find: '~@/',
+        replacement: pathResolve('src') + '/',
       },
       {
         find: /^~/,
