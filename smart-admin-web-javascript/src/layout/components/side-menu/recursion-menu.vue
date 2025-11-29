@@ -45,6 +45,9 @@
     },
   });
 
+  // item.menuName来自menuTree；menuTree来自 useUserStore()
+  // getMenuTree可以知道，这里前端怎么创建页面内容，是由后端来构造的
+  // 所以关键还要看 getMenuTree 的内容
   const menuTree = computed(() => useUserStore().getMenuTree || []);
   const rootSubmenuKeys = computed(() => menuTree.value.map((item) => item.menuId));
 

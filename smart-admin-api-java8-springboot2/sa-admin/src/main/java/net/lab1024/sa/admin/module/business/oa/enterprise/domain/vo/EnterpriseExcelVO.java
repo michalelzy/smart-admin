@@ -3,6 +3,9 @@ package net.lab1024.sa.admin.module.business.oa.enterprise.domain.vo;
 import cn.idev.excel.annotation.ExcelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+
 /**
  * 企业信息
  *
@@ -15,14 +18,14 @@ import lombok.Data;
 @Data
 public class EnterpriseExcelVO {
 
-    @ExcelProperty("企业名称")
+    @ExcelProperty("公司名称")
     private String enterpriseName;
 
-    @ExcelProperty("统一社会信用代码")
-    private String unifiedSocialCreditCode;
+//    @ExcelProperty("统一社会信用代码")
+//    private String unifiedSocialCreditCode;
 
-    @ExcelProperty("企业类型")
-    private String typeName;
+    @ExcelProperty("电站类型")
+    private String type;
 
     @ExcelProperty("联系人")
     private String contact;
@@ -44,5 +47,14 @@ public class EnterpriseExcelVO {
 
     @ExcelProperty("详细地址")
     private String address;
+
+    @ExcelProperty("站点名称")
+    private String stationName;
+
+    @ExcelProperty("注册时间")
+    private String registerTime;
+
+    @ExcelProperty("装机容量")
+    private String installedCapacity;
 
 }

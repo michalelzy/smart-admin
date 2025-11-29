@@ -64,7 +64,7 @@ async function getLoginInfo() {
     initVue();
     // 初始化数据字典
     useDictStore().initData(dictRes.data);
-    //更新用户信息到pinia
+    //更新用户信息到pinia。这一行，很重要，这行代码向后端拿到了数据，而这些从后端拿到的数据会用来构建前端页面。因为前端页面的内容不是写死在前端的。例如，侧边栏的内容也是根据从后端拿到的内容来构建的。
     useUserStore().setUserLoginInfo(res.data);
   } catch (e) {
     message.error(e.data ? e.data.msg : e.message);

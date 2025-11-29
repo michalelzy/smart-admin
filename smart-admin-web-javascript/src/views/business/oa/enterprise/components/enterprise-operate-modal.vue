@@ -10,11 +10,15 @@
     @cancel="onClose"
   >
     <a-form ref="formRef" :model="form" :rules="rules" :label-col="{ span: 5 }" :wrapper-col="{ span: 18 }">
-      <a-form-item label="企业名称" name="enterpriseName">
-        <a-input v-model:value="form.enterpriseName" placeholder="请输入企业名称" />
+      <a-form-item label="公司名称" name="enterpriseName">
+        <a-input v-model:value="form.enterpriseName" placeholder="请输入公司名称" />
       </a-form-item>
 
-      <a-form-item label="企业logo" name="enterpriseLogo">
+      <a-form-item label="站点名称" name="stationName">
+        <a-input v-model:value="form.stationName" placeholder="请输入站点名称" />
+      </a-form-item>
+
+      <!-- <a-form-item label="企业logo" name="enterpriseLogo">
         <Upload
           accept=".jpg,.jpeg,.png,.gif"
           :maxUploadSize="1"
@@ -22,11 +26,11 @@
           :default-file-list="form.enterpriseLogo"
           @change="enterpriseLogoChange"
         />
-      </a-form-item>
+      </a-form-item> -->
 
-      <a-form-item label="统一社会信用代码" name="unifiedSocialCreditCode">
+      <!-- <a-form-item label="统一社会信用代码" name="unifiedSocialCreditCode">
         <a-input v-model:value="form.unifiedSocialCreditCode" placeholder="请输入统一社会信用代码" />
-      </a-form-item>
+      </a-form-item> -->
 
       <a-form-item label="类型" name="type">
         <SmartEnumSelect width="100%" v-model:value="form.type" placeholder="请选择类型" enum-name="ENTERPRISE_TYPE_ENUM" />
@@ -49,11 +53,21 @@
       <a-form-item label="邮箱" name="email">
         <a-input v-model:value="form.email" placeholder="请输入邮箱" />
       </a-form-item>
+
+      <a-form-item label="注册时间" name="registerTime">
+        <a-date-picker v-model:value="form.registerTime" placeholder="请选择注册时间" style="width: 100%">
+
+        </a-date-picker>
+      </a-form-item>
       <a-form-item label="启用状态" name="disabledFlag">
         <a-switch v-model:checked="enabledChecked" @change="enabledCheckedChange" />
       </a-form-item>
 
-      <a-form-item label="营业执照" name="businessLicense">
+      <a-form-item label="装机容量" name="installedCapacity">
+        <a-input-number v-model:value="form.installedCapacity" placeholder="请输入装机容量" style="width: 100%" :precision="2" :min="0"></a-input-number>
+      </a-form-item>
+
+      <!-- <a-form-item label="营业执照" name="businessLicense">
         <Upload
           accept=".jpg,.jpeg,.png,.gif"
           :maxUploadSize="1"
@@ -61,7 +75,9 @@
           :default-file-list="form.businessLicense"
           @change="businessLicenseChange"
         />
-      </a-form-item>
+      </a-form-item> -->
+
+      
     </a-form>
   </a-modal>
 </template>
@@ -78,6 +94,7 @@
   import { smartSentry } from '/@/lib/smart-sentry';
   import SmartEnumSelect from '/@/components/framework/smart-enum-select/index.vue';
 
+  import dayjs from 'dayjs';
   defineExpose({
     showModal,
   });
@@ -88,6 +105,7 @@
   const visible = ref(false);
 
   function showModal(enterpriseId) {
+    console.log('企业时：',enterpriseId);
     Object.assign(form, formDefault);
     area.value = [];
     if (enterpriseId) {
@@ -119,6 +137,13 @@
     try {
       let result = await enterpriseApi.detail(enterpriseId);
       let data = result.data;
+      console.log('返回的 registerTime 是', data.registerTime);
+      console.log('register.Time的类型是',typeof data.registerTime);
+      // 这里是解决一个错误。就是在“编辑”时，查询数据库会返回一个字符串的时间，但是前端组件时一个 <a-date-picker> 无法直接和字符串匹配
+      // 所以就需要用dayjs先将字符串转换为dayjs（一种Date类型可以和 <a-date-picker> 兼容>，不然就会报错，导致前端逻辑错误
+      if (data.registerTime) {
+        data.registerTime = dayjs(data.registerTime);
+      }
       Object.assign(form, data);
       nextTick(() => {
         // 省市区不存在，不需要赋值
@@ -155,12 +180,15 @@
   const formDefault = {
     enterpriseId: undefined,
     enterpriseName: undefined,
+    stationName: undefined,
     unifiedSocialCreditCode: undefined,
     businessLicense: undefined,
     contact: undefined,
     enterpriseLogo: undefined,
     contactPhone: undefined,
     email: undefined,
+    registerTime: undefined,
+    installedCapacity: undefined,
     province: undefined,
     provinceName: undefined,
     city: undefined,
@@ -171,15 +199,20 @@
     disabledFlag: false,
   };
   let form = reactive({ ...formDefault });
+  // 强制输入规则（如果想某个输入内容必须强制输入）
   const rules = {
     enterpriseName: [{ required: true, message: '请输入企业名称' }],
-    unifiedSocialCreditCode: [{ required: true, message: '请输入统一社会信用代码' }],
+    stationName: [{ required: true, message: '请输入站点名称' }],
+    // unifiedSocialCreditCode: [{ required: true, message: '请输入统一社会信用代码' }],
     contact: [{ required: true, message: '请输入联系人' }],
     contactPhone: [
       { required: true, message: '请输入联系人电话' },
       { pattern: regular.phone, message: '请输入正确的联系人电话', trigger: 'blur' },
     ],
     type: [{ required: true, message: '请选择类型' }],
+    installedCapacity: [{ required: true, message: '请输入装机容量' }],
+    registerTime: [{ required: true, message: '请选择注册时间' }],
+
   };
 
   function onSubmit() {

@@ -35,6 +35,10 @@ export const loginApi = {
    * 获取登录信息 @author 卓大
    */
   getLoginInfo: () => {
+    // baseUrl是：http://127.0.0.1:1024/（在 .env.development 里面定义了的），那么这里
+    // getRequest 的目标地址就是 http://127.0.0.1:1024/login/getLoginInfo。那么在Java
+    // 后端一定就有 http://127.0.0.1:1024/login/getLoginInfo 这个地址的响应，也就是在 LoginController 里
+    // 定义了各个接口地址的拦截方法
     return getRequest('/login/getLoginInfo');
   },
 

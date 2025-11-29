@@ -8,7 +8,9 @@ import net.lab1024.sa.admin.module.business.oa.enterprise.constant.EnterpriseTyp
 import net.lab1024.sa.base.module.support.datatracer.annoation.DataTracerFieldEnum;
 import net.lab1024.sa.base.module.support.datatracer.annoation.DataTracerFieldLabel;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * 企业
@@ -32,7 +34,7 @@ public class EnterpriseEntity {
     /**
      * 企业名称
      */
-    @DataTracerFieldLabel("企业名称")
+    @DataTracerFieldLabel("公司名称")
     private String enterpriseName;
 
     /**
@@ -41,6 +43,11 @@ public class EnterpriseEntity {
     @DataTracerFieldLabel("企业logo")
     private String enterpriseLogo;
 
+    /**
+     * 站点名称
+     */
+    @DataTracerFieldLabel("站点名称")
+    private String stationName;
     /**
      * 统一社会信用代码
      */
@@ -150,4 +157,16 @@ public class EnterpriseEntity {
      * 更新时间
      */
     private LocalDateTime updateTime;
+
+    /**
+     * 注册时间
+     */
+    @DataTracerFieldLabel("注册时间")
+    private OffsetDateTime registerTime;
+
+    /**
+     * 注册时间
+     */
+    @DataTracerFieldLabel("装机容量")
+    private BigDecimal installedCapacity;
 }

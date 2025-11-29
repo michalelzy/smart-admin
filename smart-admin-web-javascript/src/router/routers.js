@@ -10,6 +10,7 @@
 import { homeRouters } from './system/home';
 import { loginRouters } from './system/login';
 import { helpDocRouters } from './support/help-doc';
+import {scMapRouters} from './scmap/scmap';
 import NotFound from '/@/views/system/40X/404.vue';
 import NoPrivilege from '/@/views/system/40X/403.vue';
 
@@ -20,6 +21,7 @@ export const routerArray = [
     ...loginRouters,
      ...homeRouters, 
     ...helpDocRouters, 
+    ...scMapRouters,
     /**
      * 在 Vue Router 中，路由配置是一个数组，数组中的每个元素都是一个路由对象（用 {} 包裹），每个对象代表一条路由规则
      * 

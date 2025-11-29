@@ -49,11 +49,26 @@ public class LoginController {
         return loginService.login(loginForm, ip, userAgent);
     }
 
+    // 这是 Spring MVC 的注解，作用是：
+    // 声明该方法处理 GET 请求；
+    // 匹配的请求路径是 /login/getLoginInfo（与前端调用的接口地址对应）；
+    // 前端通过 GET 方式访问这个地址时，会触发下面的方法执行。
     @GetMapping("/login/getLoginInfo")
+    // 这是 Swagger/OpenAPI 的注解，用于接口文档生成：方便开发人员理解接口用途，也用于自动化 API 文档展示。
     @Operation(summary = "获取登录结果信息  @author 卓大")
     public ResponseDTO<LoginResultVO> getLoginInfo() {
+        // ResponseDTO 是项目全局统一的响应结果封装类（包含状态码、消息、数据体）；
+        // LoginResultVO 是具体的返回数据类型（VO = View Object，视图对象），封装了前端需要的登录结果数据（用户信息、菜单、权限等）；
+        // StpUtil 是 Sa-Token（权限认证框架）的工具类，用于处理登录状态；
         String tokenValue = StpUtil.getTokenValue();
+        // AdminRequestUtil.getRequestUser()：从请求上下文获取当前登录的用户对象（如用户 ID / 账号）；
+        // loginService.getLoginResult(...)：调用LoginService（业务层）的方法，根据用户信息和 Token 组装前端需要的登录结果：
+        // 包括用户基本信息（姓名、头像、部门）；
+        // 用户权限对应的菜单列表（用于前端渲染侧边栏）；
+        // 功能权限点（用于前端按钮权限控制）等；
         LoginResultVO loginResult = loginService.getLoginResult(AdminRequestUtil.getRequestUser(), tokenValue);
+        // loginResult 是封装好的视图对象，包含前端页面构建所需的所有核心数据。
+        // loginResult.setToken(tokenValue);将 Token 设置到返回结果中：
         loginResult.setToken(tokenValue);
         return ResponseDTO.ok(loginResult);
     }

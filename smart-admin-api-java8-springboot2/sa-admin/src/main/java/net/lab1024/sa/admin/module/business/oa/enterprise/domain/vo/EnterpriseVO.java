@@ -7,7 +7,9 @@ import net.lab1024.sa.admin.module.business.oa.enterprise.constant.EnterpriseTyp
 import net.lab1024.sa.base.common.json.serializer.FileKeyVoSerializer;
 import net.lab1024.sa.base.common.swagger.SchemaEnum;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * 企业信息
@@ -85,5 +87,14 @@ public class EnterpriseVO {
 
     @Schema(description = "更新时间")
     private LocalDateTime updateTime;
+
+    @Schema(description = "站点名称")
+    private String stationName;
+
+    @Schema(description = "注册时间")
+    private LocalDateTime registerTime;
+
+    @Schema(description = "装机容量")
+    private BigDecimal installedCapacity;
 
 }

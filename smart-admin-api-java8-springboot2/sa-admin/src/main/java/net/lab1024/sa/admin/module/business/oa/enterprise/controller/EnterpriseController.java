@@ -45,8 +45,11 @@ public class EnterpriseController {
     @Resource
     private EnterpriseService enterpriseService;
 
+
+    // @Operation注解是Swagger/OpenAPI 规范中的核心注解（通常来自io.swagger.v3.oas.annotations.Operation），它的作用是为接口生成标准化的 API 文档，让接口信息更清晰、可维护，同时支持自动化文档展示和接口测试。
     @Operation(summary = "分页查询企业模块 @author 开云")
     @PostMapping("/oa/enterprise/page/query")
+    // 这个注解是 Sa-Token 框架 提供的权限校验注解（Sa-Token 是一款轻量级 Java 权限认证框架），核心作用是：拦截当前接口的访问请求，校验调用者是否拥有指定权限（oa:enterprise:query），无权限则直接拒绝访问。
     @SaCheckPermission("oa:enterprise:query")
     public ResponseDTO<PageResult<EnterpriseVO>> queryByPage(@RequestBody @Valid EnterpriseQueryForm queryForm) {
         return enterpriseService.queryByPage(queryForm);
@@ -64,7 +67,7 @@ public class EnterpriseController {
         String watermark = AdminRequestUtil.getRequestUser().getActualName();
         watermark += SmartLocalDateUtil.format(LocalDateTime.now(), SmartDateFormatterEnum.YMD_HMS);
 
-        SmartExcelUtil.exportExcelWithWatermark(response,"企业基本信息.xlsx","企业信息",EnterpriseExcelVO.class,data,watermark);
+        SmartExcelUtil.exportExcelWithWatermark(response,"电站基本信息.xlsx","电站信息",EnterpriseExcelVO.class,data,watermark);
 
     }
 
@@ -75,11 +78,13 @@ public class EnterpriseController {
         return ResponseDTO.ok(enterpriseService.getDetail(enterpriseId));
     }
 
+    //是的，前端传递的内容会自动映射并装入 createVO（即 EnterpriseCreateForm 对象），这是 Spring MVC 的参数绑定机制实现的，具体过程如下：@RequestBody 注解：表示 Spring 会将前端 POST 请求的JSON 格式请求体，通过 Jackson 等 JSON 解析工具，自动转换为 EnterpriseCreateForm 类型的 Java 对象（即 createVO）。
     @Operation(summary = "新建企业 @author 开云")
     @PostMapping("/oa/enterprise/create")
     @SaCheckPermission("oa:enterprise:add")
     public ResponseDTO<String> createEnterprise(@RequestBody @Valid EnterpriseCreateForm createVO) {
         RequestUser requestUser = SmartRequestUtil.getRequestUser();
+
         createVO.setCreateUserId(requestUser.getUserId());
         createVO.setCreateUserName(requestUser.getUserName());
         return enterpriseService.createEnterprise(createVO);

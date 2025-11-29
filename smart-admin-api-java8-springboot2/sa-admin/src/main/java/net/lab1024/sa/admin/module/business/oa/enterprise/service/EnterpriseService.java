@@ -100,6 +100,7 @@ public class EnterpriseService {
         }
         // 数据插入
         EnterpriseEntity insertEnterprise = SmartBeanUtil.copy(createVO, EnterpriseEntity.class);
+        // 向数据库中插入记录（EnterpriseEntity），继承了 mybatis-core-plus 的自动 CRUD 接口
         enterpriseDao.insert(insertEnterprise);
         dataTracerService.insert(insertEnterprise.getEnterpriseId(), DataTracerTypeEnum.OA_ENTERPRISE);
         return ResponseDTO.ok();

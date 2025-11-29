@@ -1,0 +1,230 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "data\\logs\\.0a60591fc32343bf5aad4d4905a2f799ac80eab1-audit.json",
+    "files": [
+        {
+            "date": 1763975079456,
+            "name": "data\\logs\\pv_data_20251124_170439.log",
+            "hash": "fc73dec9abac11d4c6806261ecdb990f6a8e08f19a0d9be7188d55f8d627019a"
+        },
+        {
+            "date": 1763975104032,
+            "name": "data\\logs\\pv_data_20251124_170504.log",
+            "hash": "7719d7f6d8c3eebc466abc2da00c4b7948c404cac0de5a29303a396ad3804932"
+        },
+        {
+            "date": 1763975254763,
+            "name": "data\\logs\\pv_data_20251124_170734.log",
+            "hash": "ba2515e7b28a02a18bf892245633ec4f4cc58038c28152d55c50b9937b746592"
+        },
+        {
+            "date": 1763975538029,
+            "name": "data\\logs\\pv_data_20251124_171218.log",
+            "hash": "2df07c7fbb32d714794fc0d937f17b6cf38ada525f38f9e04091b412a1fd596b"
+        },
+        {
+            "date": 1763975700055,
+            "name": "data\\logs\\pv_data_20251124_171500.log",
+            "hash": "1d0fc7a6d66a5c3301dda9ca8d1d383de8c59593e38a80e91112b9b90fa2d7c1"
+        },
+        {
+            "date": 1763975736407,
+            "name": "data\\logs\\pv_data_20251124_171536.log",
+            "hash": "f5b70bdb051571ff5550c714f7bddb37b038aac308fb77f2e5c905a1d98a4732"
+        },
+        {
+            "date": 1763975742103,
+            "name": "data\\logs\\pv_data_20251124_171542.log",
+            "hash": "f89d3b3efd2cffa34c1c57abadaf8138c1c70664a69de323745649d5c0674a13"
+        },
+        {
+            "date": 1763975769741,
+            "name": "data\\logs\\pv_data_20251124_171609.log",
+            "hash": "24e1fb4ff8b3a70e397155b3e13d67b3827dc6e4977ece22445de1ef2859d577"
+        },
+        {
+            "date": 1763975793654,
+            "name": "data\\logs\\pv_data_20251124_171633.log",
+            "hash": "36e50de1c85fb90c9b70b9170f3cbb1652df42a6fad1487b174c76abce5cd0a0"
+        },
+        {
+            "date": 1763975818287,
+            "name": "data\\logs\\pv_data_20251124_171658.log",
+            "hash": "bf9d59b24a6a22ef9b9d34f249c7248433a1a39a0f17da333a5bd226b12d0ac3"
+        },
+        {
+            "date": 1763976160399,
+            "name": "data\\logs\\pv_data_20251124_172240.log",
+            "hash": "599586edfa6a4604d2e23713561666f5f9183c8899044b7c8a073a4740567c76"
+        },
+        {
+            "date": 1763976171746,
+            "name": "data\\logs\\pv_data_20251124_172251.log",
+            "hash": "9263142b4430f28434f249d727b1fab2e50a12ee640bfac35e3ec6e0fd38a192"
+        },
+        {
+            "date": 1763976500964,
+            "name": "data\\logs\\pv_data_20251124_172820.log",
+            "hash": "7dbf93acaf058d8f9789d27e3c5577380f6d559b759c776b18899c1bab538a2d"
+        },
+        {
+            "date": 1763976510063,
+            "name": "data\\logs\\pv_data_20251124_172830.log",
+            "hash": "556c13e116c4ca8478fab7394582d079e032944005369c4236a8839cb0d07be0"
+        },
+        {
+            "date": 1763976548149,
+            "name": "data\\logs\\pv_data_20251124_172908.log",
+            "hash": "c77e00373f83d3d97119559481d75b1f97427773cecd5ee8f692d8d4d8149d49"
+        },
+        {
+            "date": 1763976555278,
+            "name": "data\\logs\\pv_data_20251124_172915.log",
+            "hash": "d03cbc9ece62ccaf2476c1b68777c0762b14392a6df61962b891c055b6c83ba1"
+        },
+        {
+            "date": 1763976574774,
+            "name": "data\\logs\\pv_data_20251124_172934.log",
+            "hash": "b6b614fe812e8a8a5d5129c22cadf3a1df8a8a0ac264a92391aee0d2e3b7c408"
+        },
+        {
+            "date": 1763976577829,
+            "name": "data\\logs\\pv_data_20251124_172937.log",
+            "hash": "299758ab2dcfe30f94cc27b6da2a7a19cc90bad1b92a2324d504717ec71cb41b"
+        },
+        {
+            "date": 1763976787883,
+            "name": "data\\logs\\pv_data_20251124_173307.log",
+            "hash": "e97718cdb46f321205b20fc6fb6d4bf97cdafe2536c5b1f5dc38fbe28637a7ce"
+        },
+        {
+            "date": 1763976823729,
+            "name": "data\\logs\\pv_data_20251124_173343.log",
+            "hash": "1f5d19b77619640e6a8fa72ed6d358af880a448005dc7438ba4f65dd29badef8"
+        },
+        {
+            "date": 1763976828881,
+            "name": "data\\logs\\pv_data_20251124_173348.log",
+            "hash": "4669540a732eb4c0dae6f2130dea9064df64c95f78d32e6f3a9307c48552e0c1"
+        },
+        {
+            "date": 1763981563143,
+            "name": "data\\logs\\pv_data_20251124_185243.log",
+            "hash": "d8e7c44493525f3aaecbb3d3fdace859d44fd2f45cb0eef2d09b44f5fa2bdc90"
+        },
+        {
+            "date": 1763981616248,
+            "name": "data\\logs\\pv_data_20251124_185336.log",
+            "hash": "2b39a7e2d993f06bd67e3bf79a98bbc4000e0cdf3e4dac3b6f620f752fea1a6f"
+        },
+        {
+            "date": 1763981635977,
+            "name": "data\\logs\\pv_data_20251124_185355.log",
+            "hash": "25ab2db752ec551c2e70cbfebe9564527ad98d1c0e689b0b6561c1cb136c9a38"
+        },
+        {
+            "date": 1763981647285,
+            "name": "data\\logs\\pv_data_20251124_185407.log",
+            "hash": "3cd0b7dca00a8047c9704cdc5d8a8388e62328d0f952ac7c3b4670b2901a6a72"
+        },
+        {
+            "date": 1763982584678,
+            "name": "data\\logs\\pv_data_20251124_190944.log",
+            "hash": "8a32949ceb8fbd38c60709ad32aae902715c03cccfed27ddfde4f63f7f764964"
+        },
+        {
+            "date": 1763982680571,
+            "name": "data\\logs\\pv_data_20251124_191120.log",
+            "hash": "ad7e2131cca40e6b4565a6e2661ae6f532d62992b99eef3fa241a5b54d7964d0"
+        },
+        {
+            "date": 1763982696664,
+            "name": "data\\logs\\pv_data_20251124_191136.log",
+            "hash": "6a6dca1b961cecb756d7634d6944b43d3319c987ec3e8bf2934a1c32e6a7fb17"
+        },
+        {
+            "date": 1763983306005,
+            "name": "data\\logs\\pv_data_20251124_192146.log",
+            "hash": "67a1f9edfbb9b396a2bb098743b774f74a603a8a73cd2c43daec489c048630c2"
+        },
+        {
+            "date": 1763983380719,
+            "name": "data\\logs\\pv_data_20251124_192300.log",
+            "hash": "007a088dee57e4a875d7e2679fa08d563f6009a320a9477eab05e6c20ae75540"
+        },
+        {
+            "date": 1763983521996,
+            "name": "data\\logs\\pv_data_20251124_192521.log",
+            "hash": "c8bca3b9d06b318272bc61e96a321c400d7dd8530dc9f0db89a929fa3a12d846"
+        },
+        {
+            "date": 1763983867912,
+            "name": "data\\logs\\pv_data_20251124_193107.log",
+            "hash": "dfcc54413edcff955fe706b38570dd7af3ed8ca32db6631885d3155dcc13b503"
+        },
+        {
+            "date": 1763984028124,
+            "name": "data\\logs\\pv_data_20251124_193348.log",
+            "hash": "9773c0526a99bcee6ecb0abe602138f3d41a837694fa4f6831385ceb9142459e"
+        },
+        {
+            "date": 1763984034494,
+            "name": "data\\logs\\pv_data_20251124_193354.log",
+            "hash": "eb357f419f2ee1748504047aaab0db1b8ec1907204fc140a72b893843e0a910e"
+        },
+        {
+            "date": 1763984085907,
+            "name": "data\\logs\\pv_data_20251124_193445.log",
+            "hash": "c4d896bf98041d5ef804ccea588a7b023f3d994e52b98d8f8ac12e26cfcfe5e9"
+        },
+        {
+            "date": 1763984090332,
+            "name": "data\\logs\\pv_data_20251124_193450.log",
+            "hash": "a379ab4461ab78b7bd33f49fc2cdaa64263706febfc467e43f254ee2a8540580"
+        },
+        {
+            "date": 1763984116174,
+            "name": "data\\logs\\pv_data_20251124_193516.log",
+            "hash": "1726d4bd464c93ded38f5affb20df3bac83c57f7249d31804f99b21eec375c0e"
+        },
+        {
+            "date": 1763984134453,
+            "name": "data\\logs\\pv_data_20251124_193534.log",
+            "hash": "bd9746a5e423cdce3e96a07d153187ce42fcc69a30ad09c49edde9744481f86e"
+        },
+        {
+            "date": 1763984221107,
+            "name": "data\\logs\\pv_data_20251124_193701.log",
+            "hash": "d4757a8dc32e8227761d34861be05682b980234547f53c47b368c8e65ca1381e"
+        },
+        {
+            "date": 1763984224787,
+            "name": "data\\logs\\pv_data_20251124_193704.log",
+            "hash": "3a7b60c9e69311ad75dfd036699cc9619306bcd894d9f782244049acced29281"
+        },
+        {
+            "date": 1763998132134,
+            "name": "data\\logs\\pv_data_20251124_232852.log",
+            "hash": "85470c963386cdeff9edead6ce2b23e54c1dc27257f6247cb9087b8850ee2b99"
+        },
+        {
+            "date": 1763998193822,
+            "name": "data\\logs\\pv_data_20251124_232953.log",
+            "hash": "5edf013969c62510d69829168d3dc13a789bc5417781bb426349f4428f564649"
+        },
+        {
+            "date": 1763998201380,
+            "name": "data\\logs\\pv_data_20251124_233001.log",
+            "hash": "4442d4473610a2a4f971de8aadca029b06e1398a3fe2632a870c054087baba1a"
+        },
+        {
+            "date": 1763998699330,
+            "name": "data\\logs\\pv_data_20251124_233819.log",
+            "hash": "db89fcab1abcda7b1d0b2b062dc4e4dab965e7b946b570ad245ad4f8b2de0427"
+        }
+    ],
+    "hashType": "sha256"
+}

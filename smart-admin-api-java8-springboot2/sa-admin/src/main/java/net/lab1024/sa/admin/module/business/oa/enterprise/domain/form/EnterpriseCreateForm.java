@@ -15,6 +15,9 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * OA企业模块创建
@@ -28,9 +31,9 @@ import javax.validation.constraints.Pattern;
 @Data
 public class EnterpriseCreateForm {
 
-    @Schema(description = "企业名称")
-    @NotBlank(message = "企业名称不能为空")
-    @Length(max = 200, message = "企业名称最多200字符")
+    @Schema(description = "公司名称")
+    @NotBlank(message = "公司名称不能为空")
+    @Length(max = 200, message = "公司名称最多200字符")
     private String enterpriseName;
 
     @Schema(description = "企业logo")
@@ -39,9 +42,9 @@ public class EnterpriseCreateForm {
     private String enterpriseLogo;
 
     @Schema(description = "统一社会信用代码")
-    @NotBlank(message = "统一社会信用代码不能为空")
+//    @NotBlank(message = "统一社会信用代码不能为空")
     @Length(max = 200, message = "统一社会信用代码最多200字符")
-    private String unifiedSocialCreditCode;
+    private String unifiedSocialCreditCode = "默认信用代码";
 
     @Schema(description = "联系人")
     @NotBlank(message = "联系人不能为空")
@@ -97,5 +100,20 @@ public class EnterpriseCreateForm {
 
     @Schema(description = "创建人", hidden = true)
     private String createUserName;
+
+    @Schema(description = "站点名称")
+    @NotBlank(message = "站点名称不能为空")
+    @Length(max = 200, message = "公司名称最多200字符")
+    private String stationName;
+
+    @Schema(description = "注册时间")
+    @NotNull(message = "注册时间不能为空")
+    private OffsetDateTime registerTime;
+
+    @Schema(description = "装机容量")
+    @NotNull(message = "装机容量不能为空")
+    private BigDecimal installedCapacity;
+
+
 
 }

@@ -75,6 +75,7 @@ export default {
       return result;
     };
 
+    // app.config.globalProperties是Vue提供的全局属性挂载入口，任何挂载到这里的属性/方法，都会成为Vue实例的全局属性；则在Vue项目的其他任何地方，就可以通过 $smartEnumPlugin 这样的方式来使用了
     app.config.globalProperties.$smartEnumPlugin = smartEnumPlugin;
     app.provide('smartEnumPlugin', smartEnumPlugin);
   },

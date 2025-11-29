@@ -8,10 +8,11 @@
   * @Copyright  1024创新实验室 （ https://1024lab.net ），Since 2012
 -->
 <template>
+  <!-- 根据当前用户的权限（如是否拥有 oa:enterprise:query 权限），决定所在元素（这里是 <a-form>）是否显示、禁用或隐藏。 -->
   <a-form class="smart-query-form" v-privilege="'oa:enterprise:query'">
     <a-row class="smart-query-form-row">
       <a-form-item label="关键字" class="smart-query-form-item">
-        <a-input style="width: 300px" v-model:value="queryForm.keywords" placeholder="企业名称/联系人/联系电话" />
+        <a-input style="width: 300px" v-model:value="queryForm.keywords" placeholder="公司名称/负责人/联系电话/站点名称/创建人" />
       </a-form-item>
 
       <a-form-item label="创建时间" class="smart-query-form-item">
@@ -46,7 +47,7 @@
           <template #icon>
             <PlusOutlined />
           </template>
-          新建企业
+          新建电站
         </a-button>
         <a-button @click="exportExcel()" v-privilege="'oa:enterprise:exportExcel'" type="primary">
           <template #icon>
@@ -105,6 +106,9 @@
         :show-total="(total) => `共${total}条`"
       />
     </div>
+    <!-- 将 operateRef 绑定到 EnterpriseOperate 组件 -->
+     <!-- 所以可以通过 operateRef.value.showModal() 这个方法，调用 EnterpriseOperate内部的方法 -->
+      <!-- 让 EnterpriseOperate可以作为Modal显隐 -->
     <EnterpriseOperate ref="operateRef" @refresh="ajaxQuery" />
   </a-card>
 </template>
@@ -124,25 +128,54 @@
   // --------------------------- 企业表格 列 ---------------------------
 
   const columns = ref([
+    // dataIndex里面的内容还必须与数据库中的字段像符，不然信息对应不上，会造成解析错误
+    // 而数据库中的字段是按照 enterprise_name这样的，这里用的 enterpriseName 驼峰模式，
+    // 也就是说在 Java 后端的 Mybatis 中还要处理一下才能匹配上。
     {
-      title: '企业名称',
+      title: '公司名称',
       dataIndex: 'enterpriseName',
-      minWidth: 180,
+      minWidth: 100,
       ellipsis: true,
     },
     {
-      title: '统一社会信用代码',
-      dataIndex: 'unifiedSocialCreditCode',
-      minWidth: 170,
+      title: '站点名称',
+      dataIndex: 'stationName',
+      minWidth: 100,
       ellipsis: true,
     },
     {
-      title: '企业类型',
+      title: '省份',
+      width: 100,
+      dataIndex: 'cityName',
+    },
+    {
+      title: '区域',
+      width: 100,
+      dataIndex: 'districtName',
+    },
+    {
+      title: '详细位置',
+      width: 100,
+      dataIndex: 'address',
+    },
+    // {
+    //   title: '区域',
+    //   width: 100,
+    //   dataIndex: 'town',
+    // },
+    // {
+    //   title: '统一社会信用代码',
+    //   dataIndex: 'unifiedSocialCreditCode',
+    //   minWidth: 170,
+    //   ellipsis: true,
+    // },
+    {
+      title: '电站类型',
       dataIndex: 'type',
       width: 100,
     },
     {
-      title: '联系人',
+      title: '负责人',
       width: 100,
       dataIndex: 'contact',
       ellipsis: true,
@@ -153,11 +186,16 @@
       dataIndex: 'contactPhone',
       ellipsis: true,
     },
+    // {
+    //   title: '邮箱',
+    //   minWidth: 100,
+    //   dataIndex: 'email',
+    //   ellipsis: true,
+    // },
     {
-      title: '邮箱',
-      minWidth: 100,
-      dataIndex: 'email',
-      ellipsis: true,
+      title: '注册时间',
+      dataIndex: 'registerTime',
+      width: 150,
     },
     {
       title: '状态',
@@ -169,9 +207,14 @@
       width: 60,
       dataIndex: 'createUserName',
     },
+    // {
+    //   title: '创建时间',
+    //   dataIndex: 'createTime',
+    //   width: 150,
+    // },
     {
-      title: '创建时间',
-      dataIndex: 'createTime',
+      title: '装机容量',
+      dataIndex: 'installedCapacity',
       width: 150,
     },
     {
@@ -206,6 +249,7 @@
   }
 
   function onSearch() {
+    // queryForm 是一个表，集合了所有查询条件
     queryForm.pageNum = 1;
     ajaxQuery();
   }
@@ -221,6 +265,7 @@
       tableLoading.value = true;
       let responseModel = await enterpriseApi.pageQuery(queryForm);
       const list = responseModel.data.list;
+      console.log(list);
       total.value = responseModel.data.total;
       tableData.value = list;
     } catch (e) {
