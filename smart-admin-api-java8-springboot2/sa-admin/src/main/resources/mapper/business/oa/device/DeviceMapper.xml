@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lab1024.sa.admin.module.business.oa.device.dao.DeviceDao">
+    <update id="deleteDevice">
+        UPDATE t_oa_device
+        SET deleted_flag = #{deletedFlag}
+        WHERE device_id = #{deviceId}
+    </update>
+<!--    这段 XML 是 MyBatis 的查询映射配置，用于定义 queryByDeviceName 方法的 SQL 逻辑, id 是和 DeviceDao中的方法名一一对应的
+        resultType 和方法的返回值对应,对应 DeviceDao 接口中的方法名（必须一致），MyBatis 通过 id 关联接口方法与 SQL；
+        #{deviceName} 对应 DeviceDao 中用 @Param 注解标注的参数
+-->
+    <select id="queryByDeviceName"
+            resultType="net.lab1024.sa.admin.module.business.oa.device.domain.entity.DeviceEntity">
+        SELECT *
+        FROM t_oa_device
+        WHERE device_name = #{deviceName}
+        AND deleted_flag = #{deletedFlag}
+        <if test="excludeDeviceId != null">
+            AND device_id != #{excludeDeviceId}
+        </if>
+    </select>
+
+    <select id="queryByStationId" resultType="net.lab1024.sa.admin.module.business.oa.device.domain.vo.DeviceVO">
+        SELECT *
+        FROM t_oa_device
+        <where>
+            deleted_flag = #{queryForm.deletedFlag}
+            <!--前端传入的stationId -->
+            <if test="queryForm.stationId != null">
+                AND station_id = #{queryForm.stationId}
+            </if>
+
+            <if test="queryForm.keywords != null and queryForm.keywords != ''">
+                AND (INSTR(device_name,#{queryForm.keywords}) OR INSTR(station_name,#{queryForm.keywords}) OR
+                INSTR(serial_number,#{queryForm.keywords}) OR INSTR(dtu_number,#{queryForm.keywords}) OR INSTR(
+                station_id, #{queryForm.keywords}
+                ))
+            </if>
+            <if test="queryForm.startTime != null">
+                AND DATE_FORMAT(create_time, '%Y-%m-%d') &gt;= #{queryForm.startTime}
+            </if>
+            <if test="queryForm.endTime != null">
+                AND DATE_FORMAT(create_time, '%Y-%m-%d') &lt;= #{queryForm.endTime}
+            </if>
+            <if test="queryForm.disabledFlag != null">
+                AND disabled_flag = #{queryForm.disabledFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryPage"
+            resultType="net.lab1024.sa.admin.module.business.oa.device.domain.vo.DeviceVO">
+        SELECT t_oa_device.*
+        FROM t_oa_device
+        <where>
+            deleted_flag = #{queryForm.deletedFlag}
+--         这个部分可以增加想要查询的 ’关键字‘
+            <if test="queryForm.keywords != null and queryForm.keywords != ''">
+                AND (INSTR(device_name,#{queryForm.keywords}) OR INSTR(station_name,#{queryForm.keywords}) OR
+                INSTR(serial_number,#{queryForm.keywords}) OR INSTR(dtu_number,#{queryForm.keywords}) OR INSTR(
+                station_id, #{queryForm.keywords}
+                ))
+            </if>
+            <if test="queryForm.startTime != null">
+                AND DATE_FORMAT(create_time, '%Y-%m-%d') &gt;= #{queryForm.startTime}
+            </if>
+            <if test="queryForm.endTime != null">
+                AND DATE_FORMAT(create_time, '%Y-%m-%d') &lt;= #{queryForm.endTime}
+            </if>
+            <if test="queryForm.disabledFlag != null">
+                AND disabled_flag = #{queryForm.disabledFlag}
+            </if>
+        </where>
+        <if test="queryForm.sortItemList == null or queryForm.sortItemList.size == 0">
+            ORDER BY device_id DESC
+        </if>
+    </select>
+
+    <select id="selectExcelExportData"
+            resultType="net.lab1024.sa.admin.module.business.oa.device.domain.vo.DeviceExcelVO">
+        SELECT t_oa_enterprise.*
+        FROM t_oa_enterprise
+        <where>
+            deleted_flag = #{queryForm.deletedFlag}
+            <if test="queryForm.keywords != null and queryForm.keywords != ''">
+                AND (INSTR(enterprise_name,#{queryForm.keywords}) OR INSTR(contact,#{queryForm.keywords}) OR
+                INSTR(contact_phone,#{queryForm.keywords}) OR INSTR(create_user_name,#{queryForm.keywords}))
+            </if>
+            <if test="queryForm.startTime != null">
+                AND DATE_FORMAT(create_time, '%Y-%m-%d') &gt;= #{queryForm.startTime}
+            </if>
+            <if test="queryForm.endTime != null">
+                AND DATE_FORMAT(create_time, '%Y-%m-%d') &lt;= #{queryForm.endTime}
+            </if>
+            <if test="queryForm.disabledFlag != null">
+                AND disabled_flag = #{queryForm.disabledFlag}
+            </if>
+        </where>
+        <if test="queryForm.sortItemList == null or queryForm.sortItemList.size == 0">
+            ORDER BY create_time DESC
+        </if>
+    </select>
+
+
+
+    <select id="queryList"
+            resultType="net.lab1024.sa.admin.module.business.oa.device.domain.vo.DeviceListVO">
+        SELECT enterprise_id, enterprise_name
+        FROM t_oa_enterprise
+        WHERE disabled_flag = #{disabledFlag}
+        AND deleted_flag = #{deletedFlag}
+        <if test="type != null">
+            AND type = #{type}
+        </if>
+    </select>
+<!--    这里定义了一个表别名 oe 。而 oe 是在 FROM t_oa_device oe 中设置的表别名，oe 就是 t_oa_device 的别名-->
+    <select id="getDetail"
+            resultType="net.lab1024.sa.admin.module.business.oa.device.domain.vo.DeviceVO">
+        SELECT oe.*
+        FROM t_oa_device oe
+        WHERE oe.device_id = #{deviceId} AND oe.deleted_flag = #{deletedFlag}
+    </select>
+
+</mapper>

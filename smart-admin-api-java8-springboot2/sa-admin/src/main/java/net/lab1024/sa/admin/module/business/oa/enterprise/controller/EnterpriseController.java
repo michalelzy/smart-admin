@@ -16,8 +16,11 @@ import net.lab1024.sa.base.common.domain.PageResult;
 import net.lab1024.sa.base.common.domain.RequestUser;
 import net.lab1024.sa.base.common.domain.ResponseDTO;
 import net.lab1024.sa.base.common.util.*;
+import net.lab1024.sa.base.module.support.helpdoc.domain.form.HelpDocCatalogAddForm;
+import net.lab1024.sa.base.module.support.helpdoc.service.HelpDocCatalogService;
 import net.lab1024.sa.base.module.support.operatelog.annotation.OperateLog;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -39,11 +42,15 @@ import java.util.List;
 @Slf4j
 @RestController
 @Tag(name = AdminSwaggerTagConst.Business.OA_ENTERPRISE)
+//@Tag注解是Swagger/OpenAPI 规范中的核心注解（通常来自io.swagger.v3.oas.annotations.tags.Tag），作用是为控制器（Controller）或接口分组、添加描述，最终生成结构化的 API 文档，提升接口文档的可读性和组织性。
 @OperateLog
 public class EnterpriseController {
 
     @Resource
     private EnterpriseService enterpriseService;
+
+    @Resource
+    private HelpDocCatalogService helpDocCatalogService;
 
 
     // @Operation注解是Swagger/OpenAPI 规范中的核心注解（通常来自io.swagger.v3.oas.annotations.Operation），它的作用是为接口生成标准化的 API 文档，让接口信息更清晰、可维护，同时支持自动化文档展示和接口测试。
@@ -78,16 +85,39 @@ public class EnterpriseController {
         return ResponseDTO.ok(enterpriseService.getDetail(enterpriseId));
     }
 
-    //是的，前端传递的内容会自动映射并装入 createVO（即 EnterpriseCreateForm 对象），这是 Spring MVC 的参数绑定机制实现的，具体过程如下：@RequestBody 注解：表示 Spring 会将前端 POST 请求的JSON 格式请求体，通过 Jackson 等 JSON 解析工具，自动转换为 EnterpriseCreateForm 类型的 Java 对象（即 createVO）。
+    //是的，前端传递的内容会自动映射并装入 createVO（即 EnterpriseCreateForm 对象），这是 Spring MVC 的参数绑定机制实现的，具体过程如下：@RequestBody 注解：表示 Spring 会将前端 POST 请求的JSON 格式请求体，通过 Jackson 等 JSON 解析工具，自动转换为 EnterpriseCreateForm 类型的 Java 对象（即 createVO）。@RequestBOdy 将 HTTP 请求体（Request Body）中的 JSON/XML 等数据自动绑定到方法的参数对象上，也就是把 Post 请求（或其他支持请求体的请求方式，如 PUT）中的 Body 内容，自动转换为方法参数对应的 Java 对象（比如这里的 EnterpriseCreateForm）。用@Valid 注解，标着这个参数对象需要进行参数校验，至于具体怎么校验，则深入到参数对象里面（这里是 EnterpriseCreateForm）去，挨个用例如 @NotBlank @Size 等进行校验。@Valid 是 “触发开关”：它的作用是告诉 Spring “需要对这个参数对象进行校验”，相当于启动校验流程的开关。
+    //实体类中的注解是 “校验规则”：@NotBlank、@Size 等注解是具体的校验规则，但这些规则必须通过 @Valid 触发才会生效。
+    //无 @Valid 则规则失效：如果 Controller 方法参数上不加 @Valid，即使实体类里写了各种校验注解，Spring 也不会执行校验，这些规则相当于 “摆设”。
     @Operation(summary = "新建企业 @author 开云")
     @PostMapping("/oa/enterprise/create")
     @SaCheckPermission("oa:enterprise:add")
+    @Transactional(rollbackFor = Exception.class)
     public ResponseDTO<String> createEnterprise(@RequestBody @Valid EnterpriseCreateForm createVO) {
         RequestUser requestUser = SmartRequestUtil.getRequestUser();
-
+        log.info("Enterprise Controller");
+        log.info(requestUser.toString());
+        log.info(createVO.toString());
+        log.info(requestUser.getUserName());
+        log.info(requestUser.getUserId().toString());
         createVO.setCreateUserId(requestUser.getUserId());
         createVO.setCreateUserName(requestUser.getUserName());
-        return enterpriseService.createEnterprise(createVO);
+
+        // 1. 获取 createVO 中的 district 变量和站点名 stationName;
+        Integer district = createVO.getDistrict();
+        String stationName = createVO.getStationName();
+        log.info("获取到的地区 district 是 {}", district);
+        log.info("获取到的地区 stationName 是 {}", stationName);
+
+//        if (district!=null) {
+//            HelpDocCatalogAddForm helpDocCatalogAddForm = new HelpDocCatalogAddForm();
+//            helpDocCatalogAddForm.setName(stationName);
+//            helpDocCatalogAddForm.setParentId(district.longValue());
+//            helpDocCatalogAddForm.setSort(0);
+//            helpDocCatalogService.add(helpDocCatalogAddForm);
+//        }
+
+        return enterpriseService.createEnterpriseWithCatalog(createVO);
+//        return enterpriseService.createEnterprise(createVO);
     }
 
     @Operation(summary = "编辑企业 @author 开云")

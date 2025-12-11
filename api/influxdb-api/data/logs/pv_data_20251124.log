@@ -1,8 +1,0 @@
-{"device_id":"PV-007","gateway_id":"simulator_gateway_001","device_status":1,"pv_power":297.9,"pv_voltage":237,"output_current":11,"output_voltage":203,"dc_meter_power":430.3,"report_time":1763998883}
-{"device_id":"PV-007","gateway_id":"simulator_gateway_001","device_status":1,"pv_power":492.5,"pv_voltage":397,"output_current":11,"output_voltage":208,"dc_meter_power":375.3,"report_time":1763998898}
-{"device_id":"PV-007","gateway_id":"simulator_gateway_001","device_status":1,"pv_power":231.1,"pv_voltage":316,"output_current":7,"output_voltage":210,"dc_meter_power":271.6,"report_time":1763998915}
-{"device_id":"PV-007","gateway_id":"simulator_gateway_001","device_status":1,"pv_power":132.2,"pv_voltage":270,"output_current":7,"output_voltage":210,"dc_meter_power":304.6,"report_time":1763998922}
-{"device_id":"PV-007","gateway_id":"simulator_gateway_001","device_status":1,"pv_power":485.8,"pv_voltage":228,"output_current":9,"output_voltage":200,"dc_meter_power":422.7,"report_time":1763998952}
-{"device_id":"PV-007","gateway_id":"simulator_gateway_001","device_status":1,"pv_power":219.9,"pv_voltage":205,"output_current":8,"output_voltage":218,"dc_meter_power":334.8,"report_time":1763999181}
-{"device_id":"PV-007","gateway_id":"simulator_gateway_001","device_status":1,"pv_power":129.5,"pv_voltage":335,"output_current":11,"output_voltage":201,"dc_meter_power":376.7,"report_time":1763999188}
-{"device_id":"PV-007","gateway_id":"simulator_gateway_001","device_status":1,"pv_power":330.7,"pv_voltage":387,"output_current":5,"output_voltage":201,"dc_meter_power":436.6,"report_time":1763999356}

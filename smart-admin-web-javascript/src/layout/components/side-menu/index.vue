@@ -12,7 +12,7 @@
 
   <!-- 1、顶部logo区域 -->
   <div class="logo" @click="onGoHome" :style="sideMenuWidth" v-if="!collapsed">
-    <img class="logo-img" :src="logoImg" />
+    <!-- <img class="logo-img" :src="logoImg" /> -->
     <div class="title smart-logo title-light" v-if="sideMenuTheme === 'light'">{{ websiteName }}</div>
     <div class="title smart-logo title-dark" v-if="sideMenuTheme === 'dark'">{{ websiteName }}</div>
   </div>
@@ -115,7 +115,7 @@
       }
 
       .title {
-        font-size: 16px;
+        font-size: 18px;
         font-weight: 600;
         margin-left: 8px;
       }

@@ -19,6 +19,47 @@ export const ENTERPRISE_TYPE_ENUM = {
   },
 };
 
+export const DEVICE_TYPE_ENUM = {
+  CONTROLLER: {
+    value: 1, 
+    desc: '控制器',
+    color: 'orange'
+  },
+  METER: {
+    value: 2, 
+    desc: '电表',
+    color: 'blue'
+  }
+}
+
+export const STATUS_ENUM = {
+  OFFLINE: {
+    value: false, 
+    desc: '离线',
+    color: 'error'
+  },
+  ONLINE: {
+    value: true, 
+    desc: '在线',
+    color: 'success'
+  }
+}
+
+export const DTU_STATUS_ENUM = {
+  OFFLINE: {
+    value: false, 
+    desc: '离线',
+    color: 'error'
+  },
+  ONLINE: {
+    value: true, 
+    desc: '在线',
+    color: 'success'
+  }
+}
+
 export default {
   ENTERPRISE_TYPE_ENUM,
+  DEVICE_TYPE_ENUM,
+  STATUS_ENUM,
 };

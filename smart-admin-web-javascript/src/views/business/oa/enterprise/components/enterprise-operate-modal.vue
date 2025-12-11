@@ -212,6 +212,7 @@
     type: [{ required: true, message: '请选择类型' }],
     installedCapacity: [{ required: true, message: '请输入装机容量' }],
     registerTime: [{ required: true, message: '请选择注册时间' }],
+    provinceCityDistrict:[{ required: true, message: '请选择注册时间' }],
 
   };
 

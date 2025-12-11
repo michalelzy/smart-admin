@@ -172,6 +172,16 @@ sa-token:
   # 是否从cookie读取token
   is-read-cookie: false
 
+# InfluxDB 2.x 配置（新增）
+influxdb:
+  url: http://127.0.0.1:8086        # InfluxDB服务地址
+  token: PDYw7fXQs2uLntkdrIc9cN_zFLQn565EPcjKpBO5EcTgZv0m4IXNytBHFxvWuSuEgHIMCtDFr2CBdYVMzDIImw==          # 认证Token（从InfluxDB控制台获取）
+  org: jc                # 组织名称（InfluxDB 2.x的组织）
+  bucket: pv_power_data          # 桶名称（存储时序数据的桶）
+  timeout: 5000                     # 连接超时时间（毫秒）
+  read-timeout: 10000               # 读取超时时间（毫秒）
+
+
 # SmartJob 定时任务配置(不需要可以直接删除以下配置，详细文档请看：https://www.xxxxxx.com)
 smart:
   job:

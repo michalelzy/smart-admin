@@ -22,6 +22,8 @@ import net.lab1024.sa.base.common.util.SmartPageUtil;
 import net.lab1024.sa.base.module.support.datatracer.constant.DataTracerTypeEnum;
 import net.lab1024.sa.base.module.support.datatracer.domain.form.DataTracerForm;
 import net.lab1024.sa.base.module.support.datatracer.service.DataTracerService;
+import net.lab1024.sa.base.module.support.helpdoc.service.HelpDocCatalogService;
+import net.lab1024.sa.base.module.support.helpdoc.domain.form.HelpDocCatalogAddForm;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +60,9 @@ public class EnterpriseService {
 
     @Resource
     private DepartmentService departmentService;
+
+    @Resource
+    private HelpDocCatalogService helpDocCatalogService;
 
     /**
      * 分页查询企业模块
@@ -104,6 +109,26 @@ public class EnterpriseService {
         enterpriseDao.insert(insertEnterprise);
         dataTracerService.insert(insertEnterprise.getEnterpriseId(), DataTracerTypeEnum.OA_ENTERPRISE);
         return ResponseDTO.ok();
+    }
+
+    /**
+     * 向 t_oa_device 和 t_help_doc_catalog 两张表中插入数据（符合事务一致性）
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseDTO<String> createEnterpriseWithCatalog(EnterpriseCreateForm createVO) {
+        // 1. 插入help_doc_catalog表
+        Integer district = createVO.getDistrict();
+        String stationName = createVO.getStationName();
+        if (district!=null) {
+            HelpDocCatalogAddForm helpDocCatalogAddForm = new HelpDocCatalogAddForm();
+            helpDocCatalogAddForm.setName(stationName);
+            helpDocCatalogAddForm.setParentId(district.longValue());
+            helpDocCatalogAddForm.setSort(0);
+            helpDocCatalogService.add(helpDocCatalogAddForm);
+        }
+
+        // 2. 插入企业表
+        return createEnterprise(createVO);
     }
 
     /**

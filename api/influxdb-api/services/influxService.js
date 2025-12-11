@@ -81,6 +81,255 @@ async function writePvData(data) {
 }
 
 /**
+ * 【新增】写入光伏设备全量指标（适配 pv_device_metrics measurement）
+ * @param {Object} data - 全量光伏设备指标数据
+ * @returns {Promise<void>}
+ */
+async function writePvFullMetrics(data) {
+  try {
+    // ========== 1. 全量字段校验 ==========
+    const requiredTags = ['device_id', 'station_id', 'device_type', 'manufacturer']; // 必传Tag
+    const missingTags = requiredTags.filter(tag => !data[tag]);
+    if (missingTags.length > 0) {
+      throw new Error(`缺少必要标签字段：${missingTags.join(', ')}`);
+    }
+
+    // 数值字段校验（核心测量值）
+    const numberFields = [
+      'pv_input_voltage_1', 'pv_input_voltage_2', 'pv_input_voltage_3', 'pv_input_voltage_4',
+      'module_output_current_1', 'module_output_current_2', 'module_output_current_3', 'module_output_current_4',
+      'output_voltage', 'output_total_current', 'output_total_power', 'output_total_voltage',
+      'load_voltage', 'load_current', 'load_power', 'battery_temperature',
+      'internal_temperature', 'co2_emission_reduction', 'module_count', 'battery_capacity',
+      'daily_generation', 'monthly_generation', 'total_generation'
+    ];
+    for (const field of numberFields) {
+      // 允许部分字段为空，但若传值则必须是数字
+      if (data[field] !== undefined && (typeof data[field] !== 'number' || isNaN(data[field]))) {
+        throw new Error(`${field} 必须是有效的数字，当前值：${data[field]}`);
+      }
+    }
+
+    // ========== 2. 时间戳处理 ==========
+    const reportTimeNano = data.report_time 
+      ? BigInt(data.report_time) * 1000000000n  // 秒级时间戳转纳秒
+      : BigInt(Date.now()) * 10n; // 当前时间（毫秒转纳秒）
+
+    // ========== 3. 构建全量数据点 ==========
+    // 自定义 measurement 名称（替换为 pv_device_metrics，如需新建只需改这个字符串）
+    const fullMeasurement = 'pv_device_metrics'; 
+    const point = new Point(fullMeasurement)
+      // ---------- Tag 部分（筛选维度，必须字符串） ----------
+      .tag('device_id', data.device_id)
+      .tag('station_id', data.station_id)
+      .tag('device_type', data.device_type)
+      .tag('manufacturer', data.manufacturer)
+      // ---------- Field 部分（测量值，数值/字符串） ----------
+      // 运行状态
+      .stringField('work_status', data.work_status || 'online')
+      // 光伏输入电压
+      .floatField('pv_input_voltage_1', data.pv_input_voltage_1 || 0)
+      .floatField('pv_input_voltage_2', data.pv_input_voltage_2 || 0)
+      .floatField('pv_input_voltage_3', data.pv_input_voltage_3 || 0)
+      .floatField('pv_input_voltage_4', data.pv_input_voltage_4 || 0)
+      // 模组输出电流
+      .floatField('module_output_current_1', data.module_output_current_1 || 0)
+      .floatField('module_output_current_2', data.module_output_current_2 || 0)
+      .floatField('module_output_current_3', data.module_output_current_3 || 0)
+      .floatField('module_output_current_4', data.module_output_current_4 || 0)
+      // 总输出
+      .floatField('output_voltage', data.output_voltage || 0)
+      .floatField('output_total_current', data.output_total_current || 0)
+      .floatField('output_total_power', data.output_total_power || 0)
+      .floatField('output_total_voltage', data.output_total_voltage || 0)
+      // 负载
+      .floatField('load_voltage', data.load_voltage || 0)
+      .floatField('load_current', data.load_current || 0)
+      .floatField('load_power', data.load_power || 0)
+      // 温度
+      .floatField('battery_temperature', data.battery_temperature || 0)
+      .floatField('internal_temperature', data.internal_temperature || 0)
+      // 环保指标
+      .floatField('co2_emission_reduction', data.co2_emission_reduction || 0)
+      // 故障
+      .stringField('fault_code', data.fault_code || '')
+      // 设备参数
+      .intField('module_count', data.module_count || 0) // 整数类型
+      .floatField('battery_capacity', data.battery_capacity || 0)
+      .stringField('device_address', data.device_address || '未知地址')
+      // 发电量
+      .floatField('daily_generation', data.daily_generation || 0)
+      .floatField('monthly_generation', data.monthly_generation || 0)
+      .floatField('total_generation', data.total_generation || 0)
+      // 时间戳
+      .timestamp(reportTimeNano);
+
+    // ========== 4. 写入 InfluxDB ==========
+    writeApi.writePoint(point);
+    await writeApi.flush(); // 强制刷新写入
+    console.log(`[InfluxDB] 全量指标 - 设备 ${data.device_id} 数据写入成功（measurement：${fullMeasurement}）`);
+
+  } catch (error) {
+    console.error('[InfluxDB] 写入光伏全量指标失败：', error.message);
+    throw new Error(`[InfluxDB] 全量指标写入失败：${error.message}`);
+  }
+}
+
+/**
+ * 【新增】查询 pv_device_metrics 全量指标数据
+ * @param {Object} params - 查询参数
+ * @param {string} [params.device_id] - 设备ID（可选，不传则查所有设备）
+ * @param {string} [params.station_id] - 站点ID（可选，不传则查所有站点）
+ * @param {string} [params.start] - 开始时间（如 "-24h" "-7d" "2024-12-01T00:00:00Z"，默认 "-24h"）
+ * @param {string} [params.end] - 结束时间（默认 "now()"）
+ * @param {Array<string>} [params.fields] - 要查询的字段列表（可选，不传则查所有字段，如 ["output_total_power", "daily_generation"]）
+ * @param {boolean} [params.latestOnly] - 是否只查每个设备的最新一条数据（默认 false）
+ * @returns {Promise<Array>} 全量指标查询结果
+ */
+async function queryPvFullMetrics(params = {}) {
+  const {
+    device_id,
+    station_id,
+    start = '-24h',
+    end = 'now()',
+    fields = [],
+    latestOnly = false
+  } = params;
+
+  // const { device_id, station_id, start = '-24h', end = 'now()' , latestOnly} = params;
+
+  // 1. 构建过滤条件
+  let filterConditions = [`r._measurement == "pv_device_metrics"`];
+  if (device_id) filterConditions.push(`r.device_id == "${device_id}"`);
+  if (station_id) filterConditions.push(`r.station_id == "${station_id}"`);
+  const filterStr = filterConditions.join(' and ');
+
+  // 2. 构建字段筛选（可选：只查指定字段）
+  let fieldFilter = '';
+  if (fields.length > 0) {
+    const fieldStr = fields.map(f => `"${f}"`).join(',');
+    fieldFilter = `|> filter(fn: (r) => contains(value: r._field, set: [${fieldStr}]))`;
+  }
+
+//   let fluxQuery = `
+//   from(bucket: "${bucket}")
+   
+//     |> range(start: ${start}, stop: ${end})
+  
+//     |> filter(fn: (r) => ${filterStr})
+   
+//     ${fieldFilter}
+  
+//     |> keep(columns: ["_time", "_field", "_value", "device_id", "station_id", "device_type", "manufacturer"])
+   
+//     |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
+ 
+//     |> sort(columns: ["_time"], desc: true)
+// `;
+  let fluxQuery = `
+    from(bucket: "${bucket}")
+      |> range(start: ${start}, stop: ${end})
+      // |> filter(fn: (r) => r._measurement == "pv_device_metrics" and r.device_id == "${device_id}")
+      |> filter(fn: (r) => ${filterStr})
+      |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") 
+  `;
+
+  // 4. 若只查最新一条数据，添加 last() 
+  if (latestOnly) {
+    fluxQuery = `
+    from(bucket: "${bucket}")
+      |> range(start: ${start}, stop: ${end})
+      // |> filter(fn: (r) => r._measurement == "pv_device_metrics" and r.device_id == "${device_id}")
+      |> filter(fn: (r) => ${filterStr})
+      |> last()
+      |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") 
+  `;
+  }
+
+  console.log(`[InfluxDB] 执行 Flux 查询：\n${fluxQuery}`);
+
+  // 5. 执行查询并格式化结果
+  return new Promise((resolve, reject) => {
+    const result = [];
+    queryApi.queryRows(fluxQuery, {
+      next(row, tableMeta) {
+        const item = tableMeta.toObject(row);
+        // 格式化返回结果（适配全量指标字段）
+        const formattedItem = {
+          // 基础维度
+          time: new Date(item._time).toLocaleString(),
+          device_id: item.device_id || '未知设备',
+          station_id: item.station_id || '未知站点',
+          device_type: item.device_type || '未知类型',
+          manufacturer: item.manufacturer || '未知厂商',
+          
+          // 运行状态
+          work_status: item.work_status || '未知状态',
+          fault_code: item.fault_code || '无故障',
+          
+          // 光伏输入电压（保留2位小数）
+          pv_input_voltage_1: item.pv_input_voltage_1 ? parseFloat(item.pv_input_voltage_1).toFixed(2) : '0.00',
+          pv_input_voltage_2: item.pv_input_voltage_2 ? parseFloat(item.pv_input_voltage_2).toFixed(2) : '0.00',
+          pv_input_voltage_3: item.pv_input_voltage_3 ? parseFloat(item.pv_input_voltage_3).toFixed(2) : '0.00',
+          pv_input_voltage_4: item.pv_input_voltage_4 ? parseFloat(item.pv_input_voltage_4).toFixed(2) : '0.00',
+          
+          // 模组输出电流
+          module_output_current_1: item.module_output_current_1 ? parseFloat(item.module_output_current_1).toFixed(2) : '0.00',
+          module_output_current_2: item.module_output_current_2 ? parseFloat(item.module_output_current_2).toFixed(2) : '0.00',
+          module_output_current_3: item.module_output_current_3 ? parseFloat(item.module_output_current_3).toFixed(2) : '0.00',
+          module_output_current_4: item.module_output_current_4 ? parseFloat(item.module_output_current_4).toFixed(2) : '0.00',
+          
+          // 总输出
+          output_voltage: item.output_voltage ? parseFloat(item.output_voltage).toFixed(2) : '0.00',
+          output_total_current: item.output_total_current ? parseFloat(item.output_total_current).toFixed(2) : '0.00',
+          output_total_power: item.output_total_power ? parseFloat(item.output_total_power).toFixed(2) : '0.00',
+          output_total_voltage: item.output_total_voltage ? parseFloat(item.output_total_voltage).toFixed(2) : '0.00',
+          
+          // 负载
+          load_voltage: item.load_voltage ? parseFloat(item.load_voltage).toFixed(2) : '0.00',
+          load_current: item.load_current ? parseFloat(item.load_current).toFixed(2) : '0.00',
+          load_power: item.load_power ? parseFloat(item.load_power).toFixed(2) : '0.00',
+          
+          // 温度
+          battery_temperature: item.battery_temperature ? parseFloat(item.battery_temperature).toFixed(2) : '0.00',
+          internal_temperature: item.internal_temperature ? parseFloat(item.internal_temperature).toFixed(2) : '0.00',
+          
+          // 环保指标
+          co2_emission_reduction: item.co2_emission_reduction ? parseFloat(item.co2_emission_reduction).toFixed(2) : '0.00',
+          
+          // 设备参数
+          module_count: item.module_count || 0,
+          battery_capacity: item.battery_capacity ? parseFloat(item.battery_capacity).toFixed(2) : '0.00',
+          device_address: item.device_address || '未知地址',
+          
+          // 发电量
+          daily_generation: item.daily_generation ? parseFloat(item.daily_generation).toFixed(2) : '0.00',
+          monthly_generation: item.monthly_generation ? parseFloat(item.monthly_generation).toFixed(2) : '0.00',
+          total_generation: item.total_generation ? parseFloat(item.total_generation).toFixed(2) : '0.00'
+        };
+        result.push(formattedItem);
+      },
+      error: (err) => {
+        console.error('[InfluxDB] 全量指标查询失败：', err);
+        reject(new Error(`全量指标查询失败：${err.message}`));
+      },
+      complete: () => {
+        // 若只查最新数据，去重（每个设备只保留一条）
+        const finalResult = latestOnly 
+          ? result.reduce((acc, curr) => {
+              if (!acc.some(item => item.device_id === curr.device_id)) {
+                acc.push(curr);
+              }
+              return acc;
+            }, [])
+          : result;
+        resolve(finalResult);
+      }
+    });
+  });
+}
+
+/**
  * 查询指定设备的历史数据（按时间范围）
  * @param {Object} params - 查询参数
  * @param {string} params.device_id - 设备ID
@@ -98,6 +347,8 @@ async function queryDeviceHistory(params) {
       |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
       |> sort(columns: ["_time"])
   `;
+
+  console.log(`[InfluxDB] 执行 Flux 查询：\n${fluxQuery}`);
 
   return new Promise((resolve, reject) => {
     const result = [];
@@ -215,7 +466,9 @@ async function statsRegionPvData(region_code = '') {
 // 导出服务方法
 module.exports = {
   writePvData,
+  writePvFullMetrics,
   queryDeviceHistory,
+  queryPvFullMetrics,
   statsRegionPvData,
   queryAllDevicesLatestStatus
 };

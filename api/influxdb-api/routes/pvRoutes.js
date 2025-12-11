@@ -19,6 +19,15 @@ router.get('/stats/region', pvController.statsRegionPvData);
 // 4. 查询所有设备最新状态（GET）。
 router.get('/devices/latest', pvController.queryAllDevicesLatestStatus);
 
+// 5. 写入光伏全量数据（POST）
+router.post('/data/full-data-write',pvController.writePvFullData);
+
+// 6. 查询全量数据
+router.get('/data/full-data-history',pvController.queryPvFullMetrics);
+
+// 7. 查询{指定设备}全量数据
+router.get('/devices/full-data-history',pvController.queryDeviceLatestFullMetrics);
+
 // 5. 获取指定设备（GET）的状态
 // @route   GET /api/pv/devices/:deviceId/latest
 // @desc    获取指定设备的最新数据

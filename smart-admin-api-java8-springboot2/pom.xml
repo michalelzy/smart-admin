@@ -53,6 +53,7 @@
         <freemarker.version>2.3.34</freemarker.version>
         <jsoup.version>1.21.1</jsoup.version>
         <tika.version>2.9.4</tika.version>
+        <influxdb.version>6.10.0</influxdb.version>
     </properties>
 
     <dependencyManagement>
@@ -345,6 +346,13 @@
                 <artifactId>tika-core</artifactId>
                 <version>${tika.version}</version>
             </dependency>
+            <!-- InfluxDB Client -->
+            <dependency>
+                <groupId>com.influxdb</groupId>
+                <artifactId>influxdb-client-java</artifactId>
+                <version>${influxdb.version}</version>
+            </dependency>
+
 
         </dependencies>
 

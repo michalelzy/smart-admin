@@ -71,6 +71,8 @@
       :loading="tableLoading"
       bordered
     >
+      <!-- <a-table> 组件提供了 bodyCell 插槽（#bodyCell 是 Vue 3 中插槽的简写语法），允许你覆盖表格默认的单元格渲染逻辑，对指定列（或所有列）的内容进行自定义展示。
+简单来说：表格默认会直接显示数据的原始值（比如 disabledFlag 显示 true/false），通过这个插槽，你可以把原始值转换成更友好的内容（比如把 true 显示为 “禁用”，false 显示为 “启用”）。 -->
       <template #bodyCell="{ column, record, text }">
         <template v-if="column.dataIndex === 'disabledFlag'">
           {{ text ? '禁用' : '启用' }}

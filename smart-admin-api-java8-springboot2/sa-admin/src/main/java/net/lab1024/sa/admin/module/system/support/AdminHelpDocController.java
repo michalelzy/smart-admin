@@ -61,6 +61,7 @@ public class AdminHelpDocController extends SupportBaseController {
 
     // --------------------- 帮助文档 【管理:增、删、查、改】-------------------------
 
+    // 因为这个这整个控制器　Controller 都是继承自 SupportBaseController，而又通过 @RequestMapping(SwaggerTagConst.Support.URL_PREFIX) 配置了前缀 URL_PREFIX，所有继承该Controller 的子类都会自动带上 /support 前缀，所以这里的所有请求都没有带 /support
     @Operation(summary = "【管理】帮助文档-分页查询 @author 卓大")
     @PostMapping("/helpDoc/query")
     @SaCheckPermission("support:helpDoc:query")
