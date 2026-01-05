@@ -11,7 +11,7 @@
   <a-form class="smart-query-form" v-privilege="'support:helpDoc:query'">
     <a-row class="smart-query-form-row">
       <a-form-item label="关键字" class="smart-query-form-item">
-        <a-input style="width: 300px" v-model:value="queryForm.keywords" placeholder="标题、作者" />
+        <a-input style="width: 300px" v-model:value="queryForm.keywords" placeholder="名称、种类" />
       </a-form-item>
 
       <a-form-item label="创建时间" class="smart-query-form-item">
@@ -39,14 +39,14 @@
   </a-form>
   <a-card size="small" :bordered="false">
     <a-row class="smart-table-btn-block">
-      <div class="smart-table-operate-block">
+      <!-- <div class="smart-table-operate-block">
         <a-button type="primary" @click="addOrUpdate()" v-privilege="'support:helpDoc:add'">
           <template #icon>
             <PlusOutlined />
           </template>
           新建
         </a-button>
-      </div>
+      </div> -->
       <div class="smart-table-setting-block">
         <TableOperator v-model="tableColumns" :tableId="TABLE_ID_CONST.SUPPORT.HELP_DOC" :refresh="queryHelpDocList" />
       </div>
@@ -62,23 +62,46 @@
         <!-- 卡片标题 + 状态 -->
         <div class="card-header">
           <h3>{{ device.deviceName }}</h3>
-          <span class="status-tag" :class="device.status === 'online' ? 'online' : 'offline'">
+          <!-- <span class="status-tag" :class="device.status === 'online' ? 'online' : 'offline'">
             {{ device.status === 'online' ? '在线' : '离线' }}
+          </span> -->
+          <span class="status-tag">
+            <a-tag
+              :color="$smartEnumPlugin.getColorByValue('DTU_STATUS_ENUM', device.device_status === '1' ? true : false)"
+              :key="device.device_status"
+              style="font-size: 15px; padding: 4px 8px;">
+              <template #icon>
+                <!-- <check-circle-outlined /> -->
+                <!-- 在线显示check-circle-outlined，离线显示close-circle-outlined（error图标） -->
+                <component :is="device.device_status === '1' ? 'check-circle-outlined' : 'close-circle-outlined'" />
+              </template>
+              {{ $smartEnumPlugin.getDescByValue('DTU_STATUS_ENUM', device.device_status === '1' ? true : false) }}
+            </a-tag>
           </span>
         </div>
 
         <!-- 设备图标 + 信息 -->
         <div class="card-content">
-          <img :src="device.icon" class="device-icon" alt="设备图标" />
+          <img :src="'https://t13.baidu.com/it/u=2559609758,4177895468&fm=224&app=112&f=JPEG?w=500&h=500'" class="device-icon" alt="设备图标" />
           <div class="device-info">
-            <p>设备种类: <span>{{ device.type }}</span></p>
-            <p>设备地址: <span>{{ device.address }}</span></p>
+            <p>设备种类:
+              <a-tag :color="$smartEnumPlugin.getColorByValue('DEVICE_TYPE_ENUM', device.type) || 'default'"
+                :key="device.type">
+                <template #icon>
+                  <!-- <check-circle-outlined /> -->
+                  <AimOutlined />
+                </template>
+                {{ $smartEnumPlugin.getDescByValue('DEVICE_TYPE_ENUM', device.type) || '未知设备' }}
+              </a-tag>
+
+            </p>
+            <p>设备地址: <span>{{ device.address || '暂无地址' }} </span></p>
             <p>版本号: <span>{{ device.version || '暂无版本号' }}</span></p>
           </div>
         </div>
 
         <!-- 详情按钮 -->
-        <a-button type="primary" class="detail-btn" @click="addOrUpdate()">详情</a-button>
+        <a-button type="primary" class="detail-btn" @click="onDetail(device.dtuNumber)">详情</a-button>
       </a-card>
 
       <!-- 无数据提示 -->
@@ -124,7 +147,7 @@
   </a-card>
 
   <!-- <HelpDocFormDrawer ref="helpDocFormDrawerRef" @reloadList="queryHelpDocList" /> -->
-  <DeviceDetailDrawer ref="helpDocFormDrawerRef" @reloadList="queryHelpDocList" />
+  <DeviceDetailDrawer ref="deviceDetailDrawerRef" @reloadList="queryHelpDocList" />
 </template>
 
 <script setup>
@@ -140,7 +163,9 @@ import { defaultTimeRanges } from '/@/lib/default-time-ranges';
 import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
 
 import { deviceApi } from '/@/api/business/oa/device-api';
+import { influxDbApi } from '/@/api/business/oa/influx-api';
 import DeviceDetailDrawer from './device-detail-drawer.vue';
+import { AimOutlined } from '@ant-design/icons-vue';
 
 // *************** 用card显示设备状态 ****************
 const deviceTableData = ref([]);
@@ -173,8 +198,8 @@ const viewDetail = (device) => {
 async function queryDeviceList() {
   try {
     const result = await deviceApi.query({
-      helpDocCatalogId: props.helpDocCatalogId, 
-      pageNum: 1, 
+      helpDocCatalogId: props.helpDocCatalogId,
+      pageNum: 1,
       pageSize: 100
     });
     tableData.value = result.data.list || [];
@@ -253,6 +278,7 @@ const tableColumns = ref([
 const tableData = ref([]);
 const total = ref(0);
 const tableLoading = ref(false);
+const mergedTableData = ref([]);
 
 onMounted(() => {
   queryHelpDocList();
@@ -265,14 +291,42 @@ async function queryHelpDocList() {
     // const result = await helpDocApi.query(queryForm);
     // const result = await deviceApi.queryByStationId(queryForm);
     // const result = await deviceApi.pageQuery(queryForm);
-   
+
+    /** 步骤一：查询 Mysql 静态数据 */
     const stationId = props.helpDocCatalogId;
-    console.log('打发打发地方',stationId);
     queryForm.stationId = stationId;
     const result = await deviceApi.queryByStationId(queryForm);
-    console.log('详情页面查询结果',result);
-    
-    tableData.value = result.data.list;
+    const list = result.data.list;
+    console.log('详情页面查询结果', list);
+
+    /**步骤二：根据mysql传递过来的dtuNumber批量查询influxDB数据 */
+    const dtuNumberList = list.map(item => item.dtuNumber);
+    const influxResult = await influxDbApi.getDtuRealTimeStatus(dtuNumberList);
+    //转换为 Map 结构，方便快速匹配（key: dtuSerialNumber, value: 实时状态）
+    const influxStatusMap = new Map();
+    (influxResult.data || []).forEach(item => {
+      const key = String(item.dtuNumber);
+      influxStatusMap.set(key, item);
+    });
+
+    /** 步驟三：合并Mysql + Influxdb */
+    mergedTableData.value = list.map(mysqlItem => {
+      const dtuKey = String(mysqlItem.dtuNumber);
+      const influxItem = influxStatusMap.get(dtuKey) || {}
+      return {
+        ...mysqlItem,
+        pv_power: influxItem.pv_power || '0.00', // 发电量
+        pv_voltage: influxItem.pv_voltage || '0.00', // 发电电压
+        output_voltage: influxItem.output_voltage || '0.00', // 输出电压
+        output_current: influxItem.output_current || '0.00', // 输出电流
+        dc_meter_power: influxItem.dc_meter_power || '0.00', // 直流电表功率
+        device_status: influxItem.device_status || '未知', // 设备状态
+        time: influxItem.time || '无数据', // 最新数据时间
+        // 其他InfluxDB字段按需添加...
+      }
+    });
+    console.log(mergedTableData);
+    tableData.value = mergedTableData.value;
     total.value = result.data.total;
   } catch (err) {
     smartSentry.captureError(err);
@@ -280,6 +334,16 @@ async function queryHelpDocList() {
   } finally {
     tableLoading.value = false;
   }
+}
+
+// =============== 创建抽屉引用 ==========
+const deviceDetailDrawerRef = ref();
+
+function onDetail(dtuNumber) {
+  // 通过dtuNumber筛选
+  const targetData = mergedTableData.value.find(item => String(item.dtuNumber) === String(dtuNumber));
+
+  deviceDetailDrawerRef.value.showModal(targetData);
 }
 
 // 点击查询
@@ -312,9 +376,8 @@ function createDateChange(dates, dateStrings) {
 // ------------------ 新建、编辑 ------------------
 
 // 新建、编辑
-const helpDocFormDrawerRef = ref();
 function addOrUpdate(helpDocId) {
-  helpDocFormDrawerRef.value.showModal(helpDocId);
+  // helpDocFormDrawerRef.value.showModal(helpDocId);
 }
 
 // ------------------ 删除 ------------------
@@ -355,8 +418,6 @@ watch(
 </script>
 
 <style lang="less" scoped>
-
-
 // 宫格布局容器
 .device-grid {
   display: grid;
@@ -386,10 +447,12 @@ watch(
         padding: 2px 8px;
         border-radius: 4px;
         font-size: 12px;
+
         &.online {
           background: #f0f9eb;
           color: #52c41a;
         }
+
         &.offline {
           background: #fff1f0;
           color: #ff4d4f;
@@ -413,9 +476,11 @@ watch(
 
       .device-info {
         flex: 1;
+
         p {
           margin: 6px 0;
           font-size: 14px;
+
           span {
             font-weight: 500;
             margin-left: 4px;
@@ -437,5 +502,4 @@ watch(
     color: #999;
   }
 }
-
 </style>

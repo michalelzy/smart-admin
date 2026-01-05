@@ -41,20 +41,20 @@ public class FileController extends SupportBaseController {
     private FileService fileService;
 
 
-    @Operation(summary = "文件上传 @author 胡克")
+    @Operation(summary = "文件上传 @author lqr")
     @PostMapping("/file/upload")
     public ResponseDTO<FileUploadVO> upload(@RequestParam MultipartFile file, @RequestParam Integer folder) {
         RequestUser requestUser = SmartRequestUtil.getRequestUser();
         return fileService.fileUpload(file, folder, requestUser);
     }
 
-    @Operation(summary = "获取文件URL：根据fileKey @author 胡克")
+    @Operation(summary = "获取文件URL：根据fileKey @author lqr")
     @GetMapping("/file/getFileUrl")
     public ResponseDTO<String> getUrl(@RequestParam String fileKey) {
         return fileService.getFileUrl(fileKey);
     }
 
-    @Operation(summary = "下载文件流（根据fileKey） @author 胡克")
+    @Operation(summary = "下载文件流（根据fileKey） @author lqr")
     @GetMapping("/file/downLoad")
     public void downLoad(@RequestParam String fileKey, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String userAgent = ServletUtil.getHeaderIgnoreCase(request, RequestHeaderConst.USER_AGENT);

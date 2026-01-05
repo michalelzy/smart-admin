@@ -66,4 +66,12 @@ export const deviceApi = {
         return postRequest('/oa/enterprise/employee/delete', param);
     },
 
+    //
+    queryDTU:(param) => {
+        return postRequest('/oa/device/dtu/query', param);
+    }
+
 };
+
+
+   

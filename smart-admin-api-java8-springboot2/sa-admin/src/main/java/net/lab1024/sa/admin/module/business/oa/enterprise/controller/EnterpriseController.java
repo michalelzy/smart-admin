@@ -64,6 +64,7 @@ public class EnterpriseController {
 
     @Operation(summary = "导出企业信息 @author 卓大")
     @PostMapping("/oa/enterprise/exportExcel")
+    @SaCheckPermission("oa:enterprise:exportExcel")
     public void exportExcel(@RequestBody @Valid EnterpriseQueryForm queryForm, HttpServletResponse response) throws IOException {
         List<EnterpriseExcelVO> data = enterpriseService.getExcelExportData(queryForm);
         if (CollectionUtils.isEmpty(data)) {
@@ -106,7 +107,7 @@ public class EnterpriseController {
         Integer district = createVO.getDistrict();
         String stationName = createVO.getStationName();
         log.info("获取到的地区 district 是 {}", district);
-        log.info("获取到的地区 stationName 是 {}", stationName);
+        log.info("获取到的站点名字 stationName 是 {}", stationName);
 
 //        if (district!=null) {
 //            HelpDocCatalogAddForm helpDocCatalogAddForm = new HelpDocCatalogAddForm();

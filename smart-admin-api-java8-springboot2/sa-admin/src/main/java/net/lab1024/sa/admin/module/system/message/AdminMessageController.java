@@ -29,7 +29,7 @@ public class AdminMessageController {
     @Autowired
     private MessageService messageService;
 
-    @Operation(summary = "通知消息-新建  @author 卓大")
+    @Operation(summary = "通知消息-新建  @author lqr")
     @PostMapping("/message/sendMessages")
     @SaCheckPermission("system:message:send")
     public ResponseDTO<String> sendMessages(@RequestBody @Valid ValidateList<MessageSendForm> messageList) {
@@ -37,7 +37,7 @@ public class AdminMessageController {
         return ResponseDTO.ok();
     }
 
-    @Operation(summary = "通知消息-分页查询   @author 卓大")
+    @Operation(summary = "通知消息-分页查询   @author lqr")
     @PostMapping("/message/query")
     @SaCheckPermission("system:message:query")
     public ResponseDTO<PageResult<MessageVO>> query(@RequestBody @Valid MessageQueryForm queryForm) {

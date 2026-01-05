@@ -97,6 +97,7 @@ public class RoleMenuService {
         res.setRoleId(roleId);
         //查询角色ID选择的菜单权限
         List<Long> selectedMenuId = roleMenuDao.queryMenuIdByRoleId(roleId);
+
         res.setSelectedMenuId(selectedMenuId);
         //查询菜单权限
         List<MenuVO> menuVOList = menuDao.queryMenuList(Boolean.FALSE, Boolean.FALSE, null);

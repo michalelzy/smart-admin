@@ -83,7 +83,13 @@
           </a-button>
         </template>
         <template v-if="column.dataIndex === 'type'">
-          <span>{{ $smartEnumPlugin.getDescByValue('ENTERPRISE_TYPE_ENUM', text) }}</span>
+          <!-- <span>{{ $smartEnumPlugin.getDescByValue('ENTERPRISE_TYPE_ENUM', text) }}</span> -->
+           <a-tag :color="$smartEnumPlugin.getColorByValue('ENTERPRISE_TYPE_ENUM', text)" :key="text" :bordered="false">
+            <template #icon>
+              <check-circle-outlined />
+            </template>
+            {{ $smartEnumPlugin.getDescByValue('ENTERPRISE_TYPE_ENUM', text) }}
+          </a-tag>
         </template>
         <template v-if="column.dataIndex === 'action'">
           <div class="smart-table-operate">
@@ -126,6 +132,7 @@
   import { defaultTimeRanges } from '/@/lib/default-time-ranges';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
+import { useRoleStore } from '/@/store/modules/system/role';
 
   // --------------------------- 企业表格 列 ---------------------------
 
@@ -327,5 +334,9 @@
     router.push({ path: '/oa/enterprise/enterprise-detail', query: { enterpriseId: enterpriseId } });
   }
 
-  onMounted(ajaxQuery);
+  // onMounted(ajaxQuery);
+
+  onMounted(() => {
+    ajaxQuery();
+  });
 </script>

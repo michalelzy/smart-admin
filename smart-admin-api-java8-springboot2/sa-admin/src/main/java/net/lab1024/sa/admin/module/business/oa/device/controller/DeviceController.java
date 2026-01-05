@@ -106,6 +106,14 @@ public class DeviceController {
         return deviceService.deleteDevice(deviceId);
     }
 
+    @Operation(summary = "page查询DTU设备模块")
+    @PostMapping("/oa/device/dtu/query")
+    @SaCheckPermission("oa:dtu:query")
+    public ResponseDTO<PageResult<DeviceVO>> queryDtuPage(@RequestBody @Valid DeviceQueryForm queryForm) {
+        ResponseDTO<PageResult<DeviceVO>> response = deviceService.queryByPage(queryForm);
+        return response;
+    }
+
 
 
 }

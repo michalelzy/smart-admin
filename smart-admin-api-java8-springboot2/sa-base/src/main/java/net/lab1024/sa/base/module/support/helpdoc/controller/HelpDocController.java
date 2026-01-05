@@ -44,7 +44,7 @@ public class HelpDocController extends SupportBaseController {
 
     // --------------------- 帮助文档 【目录】 -------------------------
 
-    @Operation(summary = "帮助文档目录-获取全部 @author 卓大")
+    @Operation(summary = "帮助文档目录-获取全部 @author lqr")
     @GetMapping("/helpDoc/helpDocCatalog/getAll")
     public ResponseDTO<List<HelpDocCatalogVO>> getAll() {
         return ResponseDTO.ok(helpDocCatalogService.getAll());
@@ -52,7 +52,7 @@ public class HelpDocController extends SupportBaseController {
 
     // --------------------- 帮助文档 【用户】-------------------------
 
-    @Operation(summary = "【用户】帮助文档-查看详情 @author 卓大")
+    @Operation(summary = "【用户】帮助文档-查看详情 @author lqr")
     @GetMapping("/helpDoc/user/view/{helpDocId}")
     @RepeatSubmit
     public ResponseDTO<HelpDocDetailVO> view(@PathVariable Long helpDocId, HttpServletRequest request) {
@@ -61,7 +61,7 @@ public class HelpDocController extends SupportBaseController {
                 helpDocId);
     }
 
-    @Operation(summary = "【用户】帮助文档-查询全部 @author 卓大")
+    @Operation(summary = "【用户】帮助文档-查询全部 @author lqr")
     @GetMapping("/helpDoc/user/queryAllHelpDocList")
     @RepeatSubmit
     public ResponseDTO<List<HelpDocVO>> queryAllHelpDocList() {
@@ -69,7 +69,7 @@ public class HelpDocController extends SupportBaseController {
     }
 
 
-    @Operation(summary = "【用户】帮助文档-查询 查看记录 @author 卓大")
+    @Operation(summary = "【用户】帮助文档-查询 查看记录 @author lqr")
     @PostMapping("/helpDoc/user/queryViewRecord")
     @RepeatSubmit
     public ResponseDTO<PageResult<HelpDocViewRecordVO>> queryViewRecord(@RequestBody @Valid HelpDocViewRecordQueryForm helpDocViewRecordQueryForm) {

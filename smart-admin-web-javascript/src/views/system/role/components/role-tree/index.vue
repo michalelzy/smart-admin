@@ -41,6 +41,7 @@
       return;
     }
     let res = await roleMenuApi.getRoleSelectedMenu(selectRoleId.value);
+    // console.log('角色对应的菜单权限数据', res.data);
     let data = res.data;
     if (_.isEmpty(roleStore.treeMap)) {
       roleStore.initTreeMap(data.menuTreeList || []);

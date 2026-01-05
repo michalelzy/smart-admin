@@ -43,7 +43,7 @@
         <a-input v-model:value="form.contactPhone" placeholder="请输入联系人电话" />
       </a-form-item>
 
-      <a-form-item label="所在城市" name="provinceCityDistrict">
+      <a-form-item label="所在城市" name="province">
         <AreaCascader type="province_city_district" style="width: 100%" v-model:value="area" placeholder="请选择所在城市" @change="changeArea" />
       </a-form-item>
       <a-form-item label="详细地址" name="address">
@@ -212,7 +212,7 @@
     type: [{ required: true, message: '请选择类型' }],
     installedCapacity: [{ required: true, message: '请输入装机容量' }],
     registerTime: [{ required: true, message: '请选择注册时间' }],
-    provinceCityDistrict:[{ required: true, message: '请选择注册时间' }],
+    province:[{ required: true, message: '请选择所在地区' }],
 
   };
 
@@ -265,7 +265,6 @@
       // 地区信息
       form.province = area.value[0].value;
       form.provinceName = area.value[0].label;
-
       form.city = area.value[1].value;
       form.cityName = area.value[1].label;
       if (area.value[2]) {

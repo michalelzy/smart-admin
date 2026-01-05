@@ -78,7 +78,7 @@ export class World extends Mini3d {
     this.depth = 0.5
     // 标志牌
     this.mapFocusLabelInfo = {
-      name: "四川省",
+      name: "广东省",
       enName: "SICHUAN PROVINCE",
       center: [113.280637, 20.625178],
     }

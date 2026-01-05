@@ -12,10 +12,12 @@ export const ENTERPRISE_TYPE_ENUM = {
   NORMAL: {
     value: 1,
     desc: '纯光站',
+    color:'#3b5999'
   },
   FOREIGN: {
     value: 2,
     desc: '叠光站',
+    color:'#55acee'
   },
 };
 
@@ -55,7 +57,43 @@ export const DTU_STATUS_ENUM = {
     value: true, 
     desc: '在线',
     color: 'success'
+  },
+  OFFLINE_STR: {
+    value: "0",
+    desc: '离线',
+    color: 'error'
+  },
+  ONLINE_STR: {
+    value: "1",
+    desc: '在线',
+    color: 'success'
+  },
+  OTHER: {
+    value: "未知",
+    desc: "未知",
+    color: '#CFD0CF'
   }
+
+}
+
+export const DTU_STATUS_STR_ENUM = {
+
+  OFFLINE: {
+    value: "0",
+    desc: '离线',
+    color: 'error'
+  },
+  ONLINE: {
+    value: "1",
+    desc: '在线',
+    color: 'success'
+  },
+  OTHER: {
+    value: "未知",
+    desc: "未知",
+    color: '#CFD0CF'
+  }
+
 }
 
 export default {

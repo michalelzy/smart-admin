@@ -57,23 +57,31 @@
 
         <!-- 设备头部信息 -->
         <div class="device-header">
-            <img src="https://t13.baidu.com/it/u=2559609758,4177895468&fm=224&app=112&f=JPEG?w=500&h=500"
-                class="device-icon" />
+            <!-- 设备图标：优先取currentDevice的icon，无则用默认图 -->
+            <img :src="currentDevice.icon || 'https://t13.baidu.com/it/u=2559609758,4177895468&fm=224&app=112&f=JPEG?w=500&h=500'"
+                class="device-icon" alt="设备图标" />
             <div class="device-info">
-                <h2>甘孜州德格错阿综合机房</h2>
+                <!-- 设备名称：取currentDevice的deviceName，无则显示“未知设备” -->
+                <h2>{{ currentDevice.deviceName || '未知设备' }}</h2>
                 <div class="device-meta">
-                    <!-- 核心：根据isOnline动态判断状态 -->
-                    <a-tag :color="isOnline ? 'success' : 'error'">
+                    <!-- 设备状态：从currentDevice的device_status判断（1/true=在线，0/false/其他=离线） -->
+                    <a-tag
+                        :color="currentDevice.device_status === '1' || currentDevice.device_status === true ? 'success' : 'error'">
                         <template #icon>
-                            <sync-outlined :spin="isOnline" />
+                            <sync-outlined
+                                :spin="currentDevice.device_status === '1' || currentDevice.device_status === true" />
                         </template>
-                        {{ isOnline ? '在线' : '离线' }}
+                        {{ currentDevice.device_status === '1' || currentDevice.device_status === true ? '在线' : '离线' }}
                     </a-tag>
-                    <!-- 设备类型标签（新增） -->
-                    <a-tag :color="deviceTypeCode === 1 ? 'blue' : 'purple'" class="type-tag">
-                        {{ deviceTypeCode === 1 ? '控制器' : '电表' }}
+                    <!-- 设备类型：从currentDevice的type判断（1=控制器，2=电表，其他=未知设备） -->
+                    <a-tag
+                        :color="currentDevice.type === 1 || currentDevice.type === '1' ? 'blue' : (currentDevice.type === 2 || currentDevice.type === '2' ? 'purple' : 'default')"
+                        class="type-tag">
+                        {{ currentDevice.type === 1 || currentDevice.type === '1' ? '控制器' : (currentDevice.type === 2 ||
+                            currentDevice.type === '2' ? '电表' : '未知设备') }}
                     </a-tag>
-                    <span class="device-address">设备地址：1</span>
+                    <!-- 设备地址：取currentDevice的address，无则显示“暂无地址” -->
+                    <span class="device-address">设备地址：{{ currentDevice.address || '暂无地址' }}</span>
                 </div>
             </div>
         </div>
@@ -93,7 +101,8 @@
                         }">
                             <div class="card-header">
                                 <span class="card-title">{{ item.title }}</span>
-                                <a-tag v-if="item.type === 'status'" :color="item.statusValue === 0 ? 'gold' : 'green'" class="status-tag">
+                                <a-tag v-if="item.type === 'status'" :color="item.statusValue === 0 ? 'gold' : 'green'"
+                                    class="status-tag">
                                     {{ item.statusValue === 0 ? '待机' : '在线' }}
                                 </a-tag>
                             </div>
@@ -120,6 +129,43 @@
             </a-tab-pane>
             <a-tab-pane tab="运行数据" key="2">
                 <!-- 运行数据同理 -->
+                <!-- 栅格布局：动态渲染卡片 -->
+                <a-row :gutter="[16, 16]">
+                    <!-- 核心：v-for 遍历 + 绑定闪烁类 -->
+                    <a-col v-for="(item, index) in runningDataList" :key="index" :xs="24" :sm="12" :md="8"
+                        class="data-col">
+                        <!-- 关键：:class 动态绑定闪烁类（item.value === 0 时生效） -->
+                        <a-card hoverable class="data-card" :class="{
+                            'status-card': item.type === 'status',
+                            'zero-flash-card': item.type === 'number' && item.value === 0 // 零值闪烁类
+                        }">
+                            <div class="card-header">
+                                <span class="card-title">{{ item.title }}</span>
+                                <a-tag v-if="item.type === 'status'" :color="item.statusValue === 0 ? 'gold' : 'green'"
+                                    class="status-tag">
+                                    {{ item.statusValue === 0 ? '待机' : '在线' }}
+                                </a-tag>
+                            </div>
+                            <div class="card-time">
+                                <clock-circle-outlined /> {{ item.updateTime }}
+                            </div>
+                            <!-- 数值类型（含单位） -->
+                            <div v-if="item.type === 'number'" class="card-value-group">
+                                <span class="card-value" :class="{ 'zero-value': item.value === 0 }">{{ item.value
+                                    }}</span>
+                                <a-badge :color="item.value === 0 ? 'red' : 'blue'" class="unit-badge">{{ item.unit
+                                    }}</a-badge>
+                            </div>
+                            <!-- 状态类型 -->
+                            <div v-if="item.type === 'status'" class="card-value status-value">{{ item.value }}</div>
+                        </a-card>
+                    </a-col>
+
+                    <!-- 无数据提示 -->
+                    <div v-if="realTimeDataList.length === 0" class="no-data">
+                        暂无实时采集数据
+                    </div>
+                </a-row>
             </a-tab-pane>
         </a-tabs>
 
@@ -143,20 +189,41 @@ import MenuTreeSelect from '/@/components/system/menu-tree-select/index.vue';
 import { smartSentry } from '/@/lib/smart-sentry';
 
 const emits = defineEmits(['reloadList']);
+// ------------------新增：存储父组件传递的设备数据------------
+const currentDevice = ref({});
 
 // ------------------ 显示，关闭 ------------------
 // 显示
 const visibleFlag = ref(false);
-function showModal(helpDocId) {
+// function showModal(helpDocId) {
+//     Object.assign(formData, defaultFormData);
+//     defaultFileList.value = [];
+//     if (helpDocId) {
+//         getDetail(helpDocId);
+//     }
+
+//     visibleFlag.value = true;
+//     nextTick(() => {
+//         formRef.value.clearValidate();
+//     });
+// }
+
+function showModal(deviceData) {
     Object.assign(formData, defaultFormData);
     defaultFileList.value = [];
-    if (helpDocId) {
-        getDetail(helpDocId);
-    }
 
+    currentDevice.value = deviceData || {};
+    // 初始化设备状态/类型（从传递的data中取值）
+    // initDeviceInfo();
+    // 初始化实时数据（从传递的data中映射）
+    // initRealTimeData();
+
+    //从currentDevice构建实时数据列表
+    buildRealTimeDataFromCurrentDevice();
+    console.log(currentDevice.value);
     visibleFlag.value = true;
     nextTick(() => {
-        formRef.value.clearValidate();
+        formRef.value?.clearValidate(); // 可选：兼容原有表单逻辑
     });
 }
 
@@ -164,9 +231,257 @@ function showModal(helpDocId) {
 function onClose() {
     visibleFlag.value = false;
 }
-
-// --------------------- 后台数据模拟 -----------------------
+// ====================== 构建实时数据列表 ====================
 const realTimeDataList = ref([]);
+const runningDataList = ref([]);
+/**
+ * 从父组件传递的currentDevice中提取数据，构建实时数据列表
+ * 映射规则：currentDevice的字段 → realTimeDataList的结构
+ */
+function buildRealTimeDataFromCurrentDevice() {
+    if (!currentDevice.value) {
+        realTimeDataList.value = [];
+        runningDataList.value = [];
+        return;
+    }
+
+    // 解构currentDevice中的数据，方便使用（根据实际字段名调整）
+    const {
+        pv_power, // 发电量
+        pv_voltage, // 发电电压
+        output_voltage, // 输出电压
+        output_current, // 输出电流
+        dc_meter_power, // 直流电表功率
+        device_status, // 设备状态
+        time, // 更新时间
+
+        // 以下为扩展字段（根据实际数据库返回的字段补充）
+        pv_voltage2 = 0,
+        pv_current1 = 0,
+        battery_voltage = 0,
+        module1_output_current = 0,
+        module2_output_current = 0,
+        module3_output_current = 0,
+        module4_output_current = 0,
+        output_total_current = 0,
+        output_total_power = 0,
+        output_total_voltage = 0,
+        load_voltage = 0,
+        load_current = 0,
+        load_power = 0,
+        battery_temperature = 0,
+        internal_temperature = 0,
+        co2_reduction = 0,
+        fault_code = 0
+    } = currentDevice.value;
+
+    realTimeDataList.value = [
+        {
+            title: '工作状态',
+            type: 'status',
+            value: device_status === '1' || device_status === true ? '在线' : '离线',
+            updateTime: time || '无数据',
+            statusValue: device_status === '1' || device_status === true ? 1 : 0,
+        },
+        {
+            title: '光伏输入电压1',
+            type: 'number',
+            value: Number(pv_voltage) || 0, // 转数字防字符串，无则默认0
+            unit: 'V',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '光伏输入电压2',
+            type: 'number',
+            value: Number(pv_voltage2) || 0,
+            unit: 'V',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '光伏输入电流1',
+            type: 'number',
+            value: Number(pv_current1) || 0,
+            unit: 'A',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '电池电压',
+            type: 'number',
+            value: Number(battery_voltage) || 0,
+            unit: 'V',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '模组1输出电流',
+            type: 'number',
+            value: Number(module1_output_current) || 0,
+            unit: 'A',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '模组2输出电流',
+            type: 'number',
+            value: Number(module2_output_current) || 0,
+            unit: 'A',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '模组3输出电流',
+            type: 'number',
+            value: Number(module3_output_current) || 0,
+            unit: 'A',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '模组4输出电流',
+            type: 'number',
+            value: Number(module4_output_current) || 0,
+            unit: 'A',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '输出电压',
+            type: 'number',
+            value: Number(output_voltage) || 0,
+            unit: 'V',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '输出总电流',
+            type: 'number',
+            value: Number(output_total_current) || 0,
+            unit: 'A',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '输出总功率',
+            type: 'number',
+            value: Number(output_total_power) || 0,
+            unit: 'kW',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '输出总电压',
+            type: 'number',
+            value: Number(output_total_voltage) || 0,
+            unit: 'V',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '负载电压',
+            type: 'number',
+            value: Number(load_voltage) || 0,
+            unit: 'V',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '负载电流',
+            type: 'number',
+            value: Number(load_current) || 0,
+            unit: 'A',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '负载功率',
+            type: 'number',
+            value: Number(load_power) || 0,
+            unit: 'kW',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '电池温度',
+            type: 'number',
+            value: Number(battery_temperature) || 0,
+            unit: '℃',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '内部温度',
+            type: 'number',
+            value: Number(internal_temperature) || 0,
+            unit: '℃',
+            updateTime: time || '无数据',
+        },
+        {
+            title: 'CO2减排',
+            type: 'number',
+            value: Number(co2_reduction) || 0,
+            unit: 'KG',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '故障代码',
+            type: 'number',
+            value: Number(fault_code) || 0,
+            unit: '',
+            updateTime: time || '无数据',
+        },
+        // 补充原有mockData中的其他字段（根据currentDevice实际字段调整）
+        {
+            title: '发电量',
+            type: 'number',
+            value: Number(pv_power) || 0,
+            unit: 'kWh',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '直流电表功率',
+            type: 'number',
+            value: Number(dc_meter_power) || 0,
+            unit: 'kW',
+            updateTime: time || '无数据',
+        },
+    ]
+    runningDataList.value = [
+        {
+            title: '模组数量',
+            type: 'number',
+            value: 1, 
+            unit: '个',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '电池容量',
+            type: 'number',
+            value: 200, 
+            unit: 'A',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '设备地址',
+            type: 'number',
+            value: '未知', 
+            unit: '',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '日发电量',
+            type: 'number',
+            value: Number(pv_power) || 0,
+            unit: 'kWh',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '月发电量',
+            type: 'number',
+            value: Number(pv_power) || 0,
+            unit: 'kWh',
+            updateTime: time || '无数据',
+        },
+        {
+            title: '总发电量',
+            type: 'number',
+            value: Number(pv_power) || 0,
+            unit: 'kWh',
+            updateTime: time || '无数据',
+        },
+    ]
+
+
+
+}
+// --------------------- 后台数据模拟 -----------------------
+
 
 // 模拟调用后台接口获取采集数据
 const getRealTimeData = async () => {
@@ -197,62 +512,126 @@ const getRealTimeData = async () => {
             updateTime: '2025-12-05 14:41:00'
         },
         {
-            title: '光伏输入电流1',
-            type: 'number',
-            value: 0,
-            unit: 'A',
-            updateTime: '2025-12-05 14:41:00'
-        },
-        {
-            title: '电池电压',
+            title: '光伏输入电压3',
             type: 'number',
             value: 0,
             unit: 'V',
             updateTime: '2025-12-05 14:41:00'
         },
         {
-            title: '光伏输入电流1',
-            type: 'number',
-            value: 2.5,
-            unit: 'A',
-            updateTime: '2025-12-05 14:41:00'
-        }, {
-            title: '光伏输入电流1',
-            type: 'number',
-            value: 2.5,
-            unit: 'A',
-            updateTime: '2025-12-05 14:41:00'
-        }, {
-            title: '光伏输入电流1',
-            type: 'number',
-            value: 2.5,
-            unit: 'A',
-            updateTime: '2025-12-05 14:41:00'
-        }, {
-            title: '光伏输入电流1',
-            type: 'number',
-            value: 2.5,
-            unit: 'A',
-            updateTime: '2025-12-05 14:41:00'
-        }, {
-            title: '光伏输入电流1',
+            title: '光伏输入电压4',
             type: 'number',
             value: 0,
-            unit: 'A',
+            unit: 'V',
             updateTime: '2025-12-05 14:41:00'
-        }, {
-            title: '光伏输入电流1',
+        },
+        {
+            title: '模组1输出电流',
             type: 'number',
             value: 0,
-            unit: 'A',
-            updateTime: '2025-12-05 14:41:00'
-        }, {
-            title: '光伏输入电流1',
-            type: 'number',
-            value: 2.5,
             unit: 'A',
             updateTime: '2025-12-05 14:41:00'
         },
+        {
+            title: '模组2输出电流',
+            type: 'number',
+            value: 0,
+            unit: 'A',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: '模组3输出电流',
+            type: 'number',
+            value: 0,
+            unit: 'A',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: '模组4输出电流',
+            type: 'number',
+            value: 0,
+            unit: 'A',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: '输出电压',
+            type: 'number',
+            value: 0,
+            unit: 'V',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: '输出总电流',
+            type: 'number',
+            value: 0,
+            unit: 'A',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: '输出总功率',
+            type: 'number',
+            value: 0,
+            unit: 'kW',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: '输出总电压',
+            type: 'number',
+            value: 0,
+            unit: 'V',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: '负载电压',
+            type: 'number',
+            value: 0,
+            unit: 'V',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: '负载电流',
+            type: 'number',
+            value: 0,
+            unit: 'A',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: '负载功率',
+            type: 'number',
+            value: 0,
+            unit: 'kW',
+            updateTime: '2025-12-05 14:41:00'
+        },
+
+        {
+            title: '电池温度',
+            type: 'number',
+            value: 0,
+            unit: '℃',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: '内部温度',
+            type: 'number',
+            value: 0,
+            unit: '℃',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: 'CO2减排',
+            type: 'number',
+            value: 0,
+            unit: 'KG',
+            updateTime: '2025-12-05 14:41:00'
+        },
+        {
+            title: '故障代码',
+            type: 'number',
+            value: 0,
+            unit: '',
+            updateTime: '2025-12-05 14:41:00'
+        },
+
     ];
     realTimeDataList.value = mockData;
 };
@@ -408,7 +787,7 @@ function changeAttachment(fileList) {
 
 // ----------------------- 页面数据加载
 onMounted(() => {
-    getRealTimeData();
+    // getRealTimeData();
 })
 
 // ----------------------- 以下是暴露的方法内容 ------------------------
@@ -471,7 +850,8 @@ defineExpose({
             gap: 3px;
             color: #666;
 
-            .status-tag, .type-tag {
+            .status-tag,
+            .type-tag {
                 margin: 0; // 清除tag默认margin，避免排版错乱
             }
 

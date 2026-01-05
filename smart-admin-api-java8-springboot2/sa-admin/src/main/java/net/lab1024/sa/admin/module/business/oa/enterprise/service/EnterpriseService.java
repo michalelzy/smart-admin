@@ -98,11 +98,11 @@ public class EnterpriseService {
      */
     @Transactional(rollbackFor = Exception.class)
     public ResponseDTO<String> createEnterprise(EnterpriseCreateForm createVO) {
-        // 验证企业名称是否重复
-        EnterpriseEntity validateEnterprise = enterpriseDao.queryByEnterpriseName(createVO.getEnterpriseName(), null, Boolean.FALSE);
-        if (Objects.nonNull(validateEnterprise)) {
-            return ResponseDTO.userErrorParam("企业名称重复");
-        }
+        // 验证企业名称是否重复 {}
+//        EnterpriseEntity validateEnterprise = enterpriseDao.queryByEnterpriseName(createVO.getEnterpriseName(), null, Boolean.FALSE);
+//        if (Objects.nonNull(validateEnterprise)) {
+//            return ResponseDTO.userErrorParam("企业名称重复");
+//        }
         // 数据插入
         EnterpriseEntity insertEnterprise = SmartBeanUtil.copy(createVO, EnterpriseEntity.class);
         // 向数据库中插入记录（EnterpriseEntity），继承了 mybatis-core-plus 的自动 CRUD 接口

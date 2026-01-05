@@ -15,12 +15,23 @@
           </a-select-option>
         </a-select>
       </a-form-item>
+      
       <!-- 显示选中站点的helpDocCatalogId -->
       <a-form-item label="站点ID" v-if="form.stationId">
         <a-input v-model:value="form.stationId" readonly placeholder="站点ID" style="background: #f5f5f5;" />
         <template #extra>
           <span class="text-secondary">当前站点的id</span>
         </template>
+      </a-form-item>
+
+      <!-- dtu序列号替换为下拉菜单 -->
+      <a-form-item label="DTU序列号" name="dtuNumber">
+        <a-select v-model:value="form.dtuNumber" placeholder="请选择dtu序列号" style="width: 100%" :options="dtuSerialList" :loading="dtuListLoading">
+          <!-- <a-select-option v-for="station in stationList" :key="station.helpDocCatalogId"
+            :value="station.helpDocCatalogId">
+            {{ station.name }}
+          </a-select-option> -->
+        </a-select>
       </a-form-item>
 
       <!-- <a-form-item label="站点名称" name="stationName">
@@ -59,9 +70,17 @@
         <a-input v-model:value="form.deviceModel" placeholder="请输入设备型号" />
       </a-form-item>
 
-      <a-form-item label="dtu序列号" name="dtuNumber">
-        <a-input v-model:value="form.dtuNumber" placeholder="请输入dtu序列号" />
+      <a-form-item label="光伏板数量" name="panelCount">
+        <a-input v-model:value="form.panelCount" placeholder="请输入光伏板数量" />
       </a-form-item>
+
+      <a-form-item label="装机容量" name="installedCapacity">
+        <a-input v-model:value="form.installedCapacity" placeholder="装机容量" />
+      </a-form-item>
+
+      <!-- <a-form-item label="dtu序列号" name="dtuNumber">
+        <a-input v-model:value="form.dtuNumber" placeholder="请输入dtu序列号" />
+      </a-form-item> -->
 
       <!-- <a-form-item label="注册时间" name="registerTime">
         <a-date-picker v-model:value="form.registerTime" placeholder="请选择注册时间" style="width: 100%">
@@ -92,7 +111,7 @@
 </template>
 
 <script setup>
-import { message } from 'ant-design-vue';
+import { install, message } from 'ant-design-vue';
 import { onMounted, watch } from 'vue';
 import _ from 'lodash';
 import { nextTick, reactive, ref } from 'vue';
@@ -117,14 +136,26 @@ const emit = defineEmits(['refresh']);
 // --------------------- modal 显示与隐藏 ---------------------
 // 是否展示
 const visible = ref(false);
-
-function showModal(deviceId) {
+/**
+ * 
+ * @param {Number} deviceId 设备ID，编辑时传入，新增时不传
+ */
+async function showModal(deviceId) {
+  //第一步：重置所有状态
+  // resetAllState();
+  // 第二步：如果有deviceId，说明是编辑，查询详情接口，填充表单
+  // 反之，则是新增，保持表单为空
+  // 查询相应接口 detail，自动填写model中的表单，才会有点击编辑，自动填充原有字段的效果
+  
+  // 第三步：展示弹窗
+  visible.value = true;
   Object.assign(form, formDefault);
   area.value = [];
-  // 查询相应接口 detail，自动填写model中的表单，才会有点击编辑，自动填充原有字段的效果
+
   if (deviceId) {
-    detail(deviceId);
+    await detail(deviceId);
   }
+  
   visible.value = true;
   nextTick(() => {
     // 解决弹窗错误信息显示,没有可忽略
@@ -143,7 +174,33 @@ function showModal(deviceId) {
   });
 }
 
+function handleModalClose() {
+  visible.value = false;
+  nextTick(() => {
+    resetAllState();
+  });
+}
+
+// 写这段代码的目的是重置弹窗中的所有状态，避免有时候会出现残留数据的问题造成无法提交表单
+function resetAllState() {
+  //1.充值表单数据，清楚所以残留数据
+  form = reactive({ ...formDefault });
+  //2.重置表单校验状态
+  if (formRef.value) {
+    formRef.value.clearValidate();
+    formRef.value.resetFields();
+  }
+  //3.重置地区选择器
+  area.value = [];
+  //4.重置开关状态
+  enabledChecked.value = !formDefault.disabledFlag;
+  //5.重置下拉选择器
+  form.stationId = undefined;
+  form.dtuNumber = undefined;
+}
+
 function onClose() {
+  handleModalClose();
   visible.value = false;
 }
 
@@ -223,6 +280,34 @@ async function queryStationList() {
   }
 }
 
+// --------------------- DTU序列号选择器 ------------------
+
+const dtuSerialList = ref([]);
+const dtuListLoading = ref(false);
+
+// 3. 新增模拟InfluxDB查询DTU序列号的方法
+async function fetchDtuSerialList() {
+  try {
+    dtuListLoading.value = true;
+    // 模拟接口请求延迟
+    await new Promise(resolve => setTimeout(resolve, 800));
+    // 模拟InfluxDB返回的DTU数据（后续替换为真实接口）
+    const mockDtuData = [
+      { label: 'DTU001-北京站点', value: '860678074035413' },
+      { label: 'DTU002-上海站点', value: '860678074080112' },
+      { label: 'DTU003-广州站点', value: '860678074049117' },
+      { label: 'DTU004-深圳站点', value: '860678074084908' },
+      { label: 'DTU005-杭州站点', value: '860678074002082' },
+    ];
+    dtuSerialList.value = mockDtuData;
+  } catch (error) {
+    smartSentry.captureError(error);
+    message.error('获取DTU序列号失败，请稍后重试');
+  } finally {
+    dtuListLoading.value = false;
+  }
+}
+
 // --------------------- 表单 ---------------------
 
 //  组件
@@ -256,6 +341,8 @@ const formDefault = {
   disabledFlag: false,
   type: undefined,
   deviceId: undefined,
+  installedCapacity: undefined,
+  panelCount: undefined,
 };
 let form = reactive({ ...formDefault });
 // 强制输入规则（如果想某个输入内容必须强制输入）
@@ -268,6 +355,7 @@ const rules = {
   versionNumber: [{ required: true, message: '请输入版本号' }],
   deviceModel: [{ required: true, message: '请输入设备型号' }],
   dtuNumber: [{ required: true, message: '请输入dtu序列号' }],
+  // dtuSerialNumber:[{ required: true, message: '请选择DTU序列号'}],
   // unifiedSocialCreditCode: [{ required: true, message: '请输入统一社会信用代码' }],
   // contact: [{ required: true, message: '请输入联系人' }],
   // contactPhone: [
@@ -275,6 +363,8 @@ const rules = {
   //   { pattern: regular.phone, message: '请输入正确的联系人电话', trigger: 'blur' },
   // ],
   type: [{ required: true, message: '请选择类型' }],
+  panelCount: [{ required: true, message: '请输入光伏板数量' }],
+  installedCapacity: [{ required: true, message: '请输入装机容量' }],
   // installedCapacity: [{ required: true, message: '请输入装机容量' }],
   // registerTime: [{ required: true, message: '请选择注册时间' }],
 
@@ -353,6 +443,7 @@ function businessLicenseChange(fileList) {
 
 onMounted(async () => {
   await queryStationList();
+  fetchDtuSerialList();
 }
 )
 </script>

@@ -32,7 +32,7 @@ public class DataTracerController extends SupportBaseController {
     @Resource
     private DataTracerService dataTracerService;
 
-    @Operation(summary = "分页查询业务操作日志 - @author 卓大")
+    @Operation(summary = "分页查询业务操作日志 - @author lqr")
     @PostMapping("/dataTracer/query")
     public ResponseDTO<PageResult<DataTracerVO>> query(@Valid @RequestBody DataTracerQueryForm queryForm) {
         return dataTracerService.query(queryForm);

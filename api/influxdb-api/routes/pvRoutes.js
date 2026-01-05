@@ -38,12 +38,24 @@ router.get('/devices/full-data-history',pvController.queryDeviceLatestFullMetric
 router.get('/:deviceId/latest', deviceController.getDeviceLatestData);
 
 // 6. 获取指定设备的历史数据
-// Method: GET
+// @Method: GET
 // URL: http://localhost:3000/api/pv/PV-007/history
 // Send
 // @route   GET /api/pv/:deviceId/history
 // @desc    获取指定设备的历史数据
 // @access  Public (你可以根据需要改为 Private)
 router.get('/:deviceId/history', deviceController.getDeviceHistory);
+
+
+// ===========适配前端的批量查询接口====================
+/**
+ * 批量查询DTU设备最新状态（仅查询influxDB，Mysql由Java服务处理）
+ * @method POST
+ * @url http://localhost:3000/pv/api/devices/batch/history
+ * @body {
+ *  dtuNumberList: {['860678074035413','860678074002082'], limit: 1, }
+ * }
+ */
+router.post('/dtu/batch/latest', deviceController.getBatchDtuLatestData);
 
 module.exports = router;

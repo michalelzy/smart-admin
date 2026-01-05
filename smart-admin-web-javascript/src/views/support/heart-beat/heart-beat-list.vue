@@ -11,11 +11,11 @@
   <a-card size="small" :bordered="false" :hoverable="true">
     <a-alert>
       <template v-slot:message>
-        <h4>Smart-Heart-Beat 心跳服务介绍：</h4>
+        <h4> 心跳服务介绍：</h4>
       </template>
       <template v-slot:description>
         <pre>
-简介：Smart-Heart-Beat 是心跳服务，用于监测Java应用的状态等其他信息。
+简介：Heart-Beat 是心跳服务，用于监测Java应用的状态等其他信息。
 原理：Java后端会在项目启动的时候开启一个线程，每隔一段时间将该应用的IP、进程号更新到数据库t_heart_beat_record表中。
 
 用途：

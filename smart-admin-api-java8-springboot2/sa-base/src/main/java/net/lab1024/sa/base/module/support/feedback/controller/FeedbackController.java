@@ -37,13 +37,13 @@ public class FeedbackController extends SupportBaseController {
     @Resource
     private FeedbackService feedbackService;
 
-    @Operation(summary = "意见反馈-分页查询 @author 开云")
+    @Operation(summary = "意见反馈-分页查询 @author lqr")
     @PostMapping("/feedback/query")
     public ResponseDTO<PageResult<FeedbackVO>> query(@RequestBody @Valid FeedbackQueryForm queryForm) {
         return feedbackService.query(queryForm);
     }
 
-    @Operation(summary = "意见反馈-新增 @author 开云")
+    @Operation(summary = "意见反馈-新增 @author lqr")
     @PostMapping("/feedback/add")
     public ResponseDTO<String> add(@RequestBody @Valid FeedbackAddForm addForm) {
         RequestUser employee = SmartRequestUtil.getRequestUser();

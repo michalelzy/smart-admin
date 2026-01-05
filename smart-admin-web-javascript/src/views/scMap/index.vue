@@ -3,7 +3,7 @@
     <!-- 地图 -->
     <mapScene ref="mapSceneRef"></mapScene>
     <div class="large-screen-wrap" id="large-screen">
-      <m-header title="青白江可视化平台" sub-text="QingBaiJiang JianCha Visualization Platform">
+      <m-header title="德瑞恒光伏系统数据看板" sub-text="De Ruiheng Solar Energy System">
         <!--左侧 天气 -->
         <template v-slot:left>
           <div class="m-header-weather"><span>小雨</span><span>27℃</span></div>
@@ -125,6 +125,7 @@
 </template>
 <script setup>
 import { shallowRef, ref, reactive, onMounted, onBeforeUnmount } from "vue"
+import { useRouter } from 'vue-router'
 import mapScene from "./map.vue"
 import mHeader from "/@/components/mHeader/index.vue"
 import mCountCard from "/@/components/mCountCard/index.vue"
@@ -145,6 +146,7 @@ import { Assets } from "./assets.js"
 import emitter from "/@/utils/emitter"
 import gsap from "gsap"
 import autofit from "autofit.js"
+import { useRoute } from "vue-router"
 
 const assets = shallowRef(null)
 const mapSceneRef = ref(null)
@@ -244,6 +246,16 @@ async function hideLoading() {
 
 function handleMenuSelect(index) {
   state.activeIndex = index
+  // 判断是否点击的是「经济概览」（index=1）
+  if (index === "1") {
+    // 方式1：在当前窗口跳转（覆盖当前页面）
+    // window.location.href = "localhost:8081/#/home"
+    
+    // 方式2：打开新标签页跳转（可选）
+    // window.open("localhost:8081/#/home", "_blank")
+    const router = useRouter();
+    router.push({path: '/home'});
+  }
 }
 // 地图开始动画播放完成
 function handleMapPlayComplete() {

@@ -19,6 +19,115 @@ import LocalStorageKeyConst from '/@/constants/local-storage-key-const.js';
 // token的消息头
 const TOKEN_HEADER = 'Authorization';
 
+// =============================== 新增：Node.js (InfluxDB 服务)的axios实例 ======================================
+// 创建专门用于请求Node.js（3000端口）的axios对象
+const influxAxios = axios.create({
+  baseURL: import.meta.env.VITE_APP_INFLUX_API_URL, // 新增环境变量：Node.js服务地址
+  timeout: 10000 // 超时时间可单独配置
+});
+
+// 复用原有请求拦截器逻辑（token、header等）
+influxAxios.interceptors.request.use(
+  (config) => {
+    const token = localRead(LocalStorageKeyConst.USER_TOKEN);
+    if (token) {
+      config.headers[TOKEN_HEADER] = 'Bearer ' + token;
+    } else {
+      delete config.headers[TOKEN_HEADER];
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// 复用原有响应拦截器逻辑（错误处理、登录失效等）
+influxAxios.interceptors.response.use(
+  (response) => {
+    // 完全复用Java服务的响应处理逻辑（加密、错误码、提示等）
+    let contentType = response.headers['content-type'] ? response.headers['content-type'] : response.headers['Content-Type'];
+    if (contentType.indexOf('application/json') === -1) {
+      return Promise.resolve(response);
+    }
+    if (response.data && response.data instanceof Blob) {
+      return Promise.reject(response.data);
+    }
+    if (response.data.dataType === DATA_TYPE_ENUM.ENCRYPT.value) {
+      response.data.encryptData = response.data.data;
+      let decryptStr = decryptData(response.data.data);
+      if (decryptStr) {
+        response.data.data = JSON.parse(decryptStr);
+      }
+    }
+    const res = response.data;
+    if (res.code && res.code !== 200) {
+      if (res.code === 30007 || res.code === 30008) {
+        message.destroy();
+        message.error('您没有登录，请重新登录');
+        setTimeout(logout, 300);
+        return Promise.reject(response);
+      }
+      if (res.code === 30010 || res.code === 30011) {
+        Modal.error({
+          title: '重要提醒',
+          content: res.msg,
+        });
+        return Promise.reject(response);
+      }
+      if (res.code === 30012) {
+        Modal.error({
+          title: '重要提醒',
+          content: res.msg,
+          onOk: logout,
+        });
+        setTimeout(logout, 3000);
+        return Promise.reject(response);
+      }
+      message.destroy();
+      message.error(res.msg);
+      return Promise.reject(response);
+    } else {
+      return Promise.resolve(res);
+    }
+  },
+  (error) => {
+    if (error.message.indexOf('timeout') !== -1) {
+      message.destroy();
+      message.error('InfluxDB服务网络超时');
+    } else if (error.message === 'Network Error') {
+      message.destroy();
+      message.error('InfluxDB服务网络连接错误');
+    } else if (error.message.indexOf('Request') !== -1) {
+      message.destroy();
+      message.error('InfluxDB服务网络发生错误');
+    }
+    return Promise.reject(error);
+  }
+);
+
+// ==============================================================================================================
+
+// ========================================= 新增：Node.js服务的请求方法 =================================
+/**
+ * InfluxDB服务（Node.js）的get请求
+ */
+export const getInfluxRequest = (url, params) => {
+  return influxAxios.request({ url, method: 'get', params });
+};
+
+/**
+ * InfluxDB服务（Node.js）的post请求
+ */
+export const postInfluxRequest = (url, data) => {
+  return influxAxios.request({
+    data,
+    url,
+    method: 'post',
+  });
+};
+
+
 // 创建axios对象
 const smartAxios = axios.create({
   baseURL: import.meta.env.VITE_APP_API_URL,

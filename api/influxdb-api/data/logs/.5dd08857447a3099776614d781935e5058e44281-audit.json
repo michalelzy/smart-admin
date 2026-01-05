@@ -6,19 +6,39 @@
     "auditLog": "data\\logs\\.5dd08857447a3099776614d781935e5058e44281-audit.json",
     "files": [
         {
-            "date": 1765209416787,
-            "name": "data\\logs\\pv_data_20251208.log",
-            "hash": "386791170b67888684e0fad8f1a615ef5d4c6bb051a00be8e006d718882d9ea5"
+            "date": 1766501107672,
+            "name": "data\\logs\\pv_data_20251223.log",
+            "hash": "a72b3669a58d118a19e342ca2dc0b6d0237fa859fd1790478c1c74bbe163a0a9"
         },
         {
-            "date": 1765287623536,
-            "name": "data\\logs\\pv_data_20251209.log",
-            "hash": "2581e1117414e39d8aff89093ad80dc5fd47b123c0dcf2b1a594c2590c843d59"
+            "date": 1766540569522,
+            "name": "data\\logs\\pv_data_20251224.log",
+            "hash": "4efd7207d043df919ff85d59f0233cb0b7b2503a187d6d02a4cdd10d2a1558b4"
         },
         {
-            "date": 1765296028706,
-            "name": "data\\logs\\pv_data_20251210.log",
-            "hash": "607291946cf76f35d2b566373cf3fb94d5687354d2c40ce88ca8b6e41805c33e"
+            "date": 1766642118742,
+            "name": "data\\logs\\pv_data_20251225.log",
+            "hash": "1ae5a139aea4d2536a722e0b78ff69cc048e2099dc18742ae4b9b7ba517f0ad6"
+        },
+        {
+            "date": 1766729570409,
+            "name": "data\\logs\\pv_data_20251226.log",
+            "hash": "a41f933ff7a25a4746f1e0a6cdf3a295e66e4c0b434a7e6885d7d1f5881f551d"
+        },
+        {
+            "date": 1766929289637,
+            "name": "data\\logs\\pv_data_20251228.log",
+            "hash": "eb71357829d293eb859a813b5232804efa6f337f006b92440117aedfef78f5b0"
+        },
+        {
+            "date": 1767433121800,
+            "name": "data\\logs\\pv_data_20260103.log",
+            "hash": "0059919b7855840e90d8c9b1d46e03acfe00a6e2fde16e8eb93f49be065bab5d"
+        },
+        {
+            "date": 1767532300152,
+            "name": "data\\logs\\pv_data_20260104.log",
+            "hash": "7de2f6a821992e88bb46c809ebe9bb2d111d871f48b84e0679dbeac05b46b11e"
         }
     ],
     "hashType": "sha256"

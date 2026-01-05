@@ -41,14 +41,14 @@ public class CodeGeneratorController extends SupportBaseController {
 
     // ------------------- 查询 -------------------
 
-    @Operation(summary = "获取表的列 @author 卓大")
+    @Operation(summary = "获取表的列 @author lqr")
     @GetMapping("/codeGenerator/table/getTableColumns/{table}")
     @ResponseBody
     public ResponseDTO<List<TableColumnVO>> getTableColumns(@PathVariable String table) {
         return ResponseDTO.ok(codeGeneratorService.getTableColumns(table));
     }
 
-    @Operation(summary = "查询数据库的表 @author 卓大")
+    @Operation(summary = "查询数据库的表 @author lqr")
     @PostMapping("/codeGenerator/table/queryTableList")
     @ResponseBody
     public ResponseDTO<PageResult<TableVO>> queryTableList(@RequestBody @Valid TableQueryForm tableQueryForm) {
@@ -57,14 +57,14 @@ public class CodeGeneratorController extends SupportBaseController {
 
     // ------------------- 配置 -------------------
 
-    @Operation(summary = "获取表的配置信息 @author 卓大")
+    @Operation(summary = "获取表的配置信息 @author lqr")
     @GetMapping("/codeGenerator/table/getConfig/{table}")
     @ResponseBody
     public ResponseDTO<TableConfigVO> getTableConfig(@PathVariable String table) {
         return ResponseDTO.ok(codeGeneratorService.getTableConfig(table));
     }
 
-    @Operation(summary = "更新配置信息 @author 卓大")
+    @Operation(summary = "更新配置信息 @author lqr")
     @PostMapping("/codeGenerator/table/updateConfig")
     @ResponseBody
     public ResponseDTO<String> updateConfig(@RequestBody @Valid CodeGeneratorConfigForm form) {
@@ -73,14 +73,14 @@ public class CodeGeneratorController extends SupportBaseController {
 
     // ------------------- 生成 -------------------
 
-    @Operation(summary = "代码预览 @author 卓大")
+    @Operation(summary = "代码预览 @author lqr")
     @PostMapping("/codeGenerator/code/preview")
     @ResponseBody
     public ResponseDTO<String> preview(@RequestBody @Valid CodeGeneratorPreviewForm form) {
         return codeGeneratorService.preview(form);
     }
 
-    @Operation(summary = "代码下载 @author 卓大")
+    @Operation(summary = "代码下载 @author lqr")
     @GetMapping(value = "/codeGenerator/code/download/{tableName}", produces = "application/octet-stream")
     public void download(@PathVariable String tableName, HttpServletResponse response) throws IOException {
 

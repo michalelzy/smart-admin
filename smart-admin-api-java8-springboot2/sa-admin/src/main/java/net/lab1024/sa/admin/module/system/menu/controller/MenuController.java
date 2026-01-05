@@ -35,7 +35,7 @@ public class MenuController {
     @Resource
     private MenuService menuService;
 
-    @Operation(summary = "添加菜单 @author 卓大")
+    @Operation(summary = "添加菜单 @author lqr")
     @PostMapping("/menu/add")
     @SaCheckPermission("system:menu:add")
     public ResponseDTO<String> addMenu(@RequestBody @Valid MenuAddForm menuAddForm) {
@@ -43,7 +43,7 @@ public class MenuController {
         return menuService.addMenu(menuAddForm);
     }
 
-    @Operation(summary = "更新菜单 @author 卓大")
+    @Operation(summary = "更新菜单 @author lqr")
     @PostMapping("/menu/update")
     @SaCheckPermission("system:menu:update")
     public ResponseDTO<String> updateMenu(@RequestBody @Valid MenuUpdateForm menuUpdateForm) {
@@ -51,32 +51,32 @@ public class MenuController {
         return menuService.updateMenu(menuUpdateForm);
     }
 
-    @Operation(summary = "批量删除菜单 @author 卓大")
+    @Operation(summary = "批量删除菜单 @author lqr")
     @GetMapping("/menu/batchDelete")
     @SaCheckPermission("system:menu:batchDelete")
     public ResponseDTO<String> batchDeleteMenu(@RequestParam("menuIdList") List<Long> menuIdList) {
         return menuService.batchDeleteMenu(menuIdList, SmartRequestUtil.getRequestUserId());
     }
 
-    @Operation(summary = "查询菜单列表 @author 卓大")
+    @Operation(summary = "查询菜单列表 @author lqr")
     @GetMapping("/menu/query")
     public ResponseDTO<List<MenuVO>> queryMenuList() {
         return ResponseDTO.ok(menuService.queryMenuList(null));
     }
 
-    @Operation(summary = "查询菜单详情 @author 卓大")
+    @Operation(summary = "查询菜单详情 @author lqr")
     @GetMapping("/menu/detail/{menuId}")
     public ResponseDTO<MenuVO> getMenuDetail(@PathVariable Long menuId) {
         return menuService.getMenuDetail(menuId);
     }
 
-    @Operation(summary = "查询菜单树 @author 卓大")
+    @Operation(summary = "查询菜单树 @author lqr")
     @GetMapping("/menu/tree")
     public ResponseDTO<List<MenuTreeVO>> queryMenuTree(@RequestParam("onlyMenu") Boolean onlyMenu) {
         return menuService.queryMenuTree(onlyMenu);
     }
 
-    @Operation(summary = "获取所有请求路径 @author 卓大")
+    @Operation(summary = "获取所有请求路径 @author lqr")
     @GetMapping("/menu/auth/url")
     public ResponseDTO<List<RequestUrlVO>> getAuthUrl() {
         return menuService.getAuthUrl();

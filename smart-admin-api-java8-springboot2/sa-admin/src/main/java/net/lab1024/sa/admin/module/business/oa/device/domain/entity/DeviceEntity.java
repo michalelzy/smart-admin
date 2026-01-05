@@ -152,6 +152,12 @@ public class DeviceEntity {
     @DataTracerFieldLabel("站点ID")
     private Integer stationId;
 
+    @DataTracerFieldLabel("光伏板数量")
+    private Integer panelCount;
+
+    @DataTracerFieldLabel("装机容量")
+    private String installedCapacity;
+
     /**
      * 注册时间
      */

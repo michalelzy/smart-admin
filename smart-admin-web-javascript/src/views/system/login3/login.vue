@@ -12,8 +12,8 @@
   <div class="login-container">
     <div class="box-item desc">
       <div class="welcome">
-        <p>欢迎登录 SmartAdmin V3</p>
-        <p class="sub-welcome">「高质量代码、简洁、高效、安全」的开发平台</p>
+        <p>欢迎登录 德瑞恒光伏管理系统</p>
+        <p class="sub-welcome">「高效、绿色、稳定」的光伏管理平台</p>
       </div>
       <img class="welcome-img" :src="loginGif" />
     </div>
@@ -46,7 +46,7 @@
         </a-form-item>
         <a-form-item>
           <a-checkbox v-model:checked="rememberPwd">记住密码</a-checkbox>
-          <span> ( 账号：admin, 密码：123456)</span>
+          <!-- <span> ( 账号：admin, 密码：123456)</span> -->
         </a-form-item>
         <a-form-item>
           <div class="btn" @click="onLogin">登录</div>
@@ -100,7 +100,7 @@
   //--------------------- 登录表单 ---------------------------------
 
   const loginForm = reactive({
-    loginName: 'admin',
+    loginName: '',
     password: '',
     captchaCode: '',
     captchaUuid: '',

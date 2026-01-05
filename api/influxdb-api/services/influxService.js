@@ -463,6 +463,120 @@ async function statsRegionPvData(region_code = '') {
     });
   }
 
+  /**
+ * 批量查询DTU最新实时状态（纯数据操作，无HTTP依赖）
+ * @param {Object} params - 查询参数
+ * @param {Array<string>} params.dtuNumberList - DTU序列号列表
+ * @param {number} [params.limit=1] - 每个DTU返回最新条数
+ * @param {string} [params.start="-1d"] - 时间范围开始
+ * @param {string} [params.end="now()"] - 时间范围结束
+ * @returns {Promise<Array>} DTU状态列表
+ */
+async function getBatchDtuLatestData(params = {}) {
+  const { dtuNumberList, limit = 1, start = '-1d', end = 'now()' } = params;
+  
+  // 纯数据校验，不返回HTTP状态码
+  if (!dtuNumberList || !Array.isArray(dtuNumberList) || dtuNumberList.length === 0) {
+    console.warn('[InfluxDB] dtuNumberList必须是非空数组');
+    return [];
+  }
+
+  const dtuStrArray = dtuNumberList.map(dtu => `"${dtu}"`).join(',');
+
+  //  const fluxQuery = `
+  //   from(bucket: "${bucket}")
+  //     |> range(start: ${start}, stop: ${end})
+  //     |> filter(fn: (r) => (r._measurement == "pv_device_metrics" or r._measurement == "${measurement}") and r.device_id in [${dtuNumberStr}])
+  //     |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
+  //     |> group(columns: ["device_id"])
+  //     |> sort(columns: ["_time"], desc: true)
+  //     |> limit(n: ${limit}, offset: 0)
+  //     |> keep(columns: ["device_id", "_time", "pv_power", "device_status", "output_voltage", "output_total_power"])
+  // `.trim();
+
+  // const dtuList = [860678074035413, 860678074080112];
+  // const dtuStrArray = dtuList.map(dtu => `"${dtu}"`).join(',');
+
+  const fluxQuery = `
+    from(bucket: "${bucket}")
+      |> range(start: ${start}, stop: ${end})
+      |> filter(fn: (r) => r._measurement == "${measurement}")
+      |> filter(fn: (r) => contains(value:r.device_id, set: [${dtuStrArray}]))
+      |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
+      |> group(columns: ["device_id"]) // 按设备分组
+      |> sort(columns: ["_time"], desc: true)
+      |> limit(n: 1, offset: 0) // 只取最新1条
+      
+  `;
+
+  console.log(`[InfluxDB] 执行批量DTU查询：\n${fluxQuery}`);
+
+  // 执行查询并格式化结果
+  return new Promise((resolve) => {
+    const dtuStatusMap = new Map();
+    
+    queryApi.queryRows(fluxQuery, {
+      next(row, tableMeta) {
+        const item = tableMeta.toObject(row);
+        const dtuNumber = item.device_id;
+        // 仅保留每个DTU最新一条数据
+        if (dtuNumber && !dtuStatusMap.has(dtuNumber)) {
+          dtuStatusMap.set(dtuNumber, {
+            time: new Date(item._time).toLocaleString(), // 格式化时间
+          dtuNumber: dtuNumber,
+          gateway_id: item.gateway_id,
+          region_code: item.region_code,
+          device_status: item.device_status,
+          pv_power: item.pv_power ? item.pv_power.toFixed(2) : 0, // 保留2位小数
+          pv_voltage: item.pv_voltage ? item.pv_voltage.toFixed(2) : 0,
+          output_voltage: item.output_voltage ? item.output_voltage.toFixed(2) : 0,
+          output_current: item.output_current ? item.output_current.toFixed(2) : 0,
+          dc_meter_power: item.dc_meter_power ? item.dc_meter_power.toFixed(2) : 0
+          });
+        }
+
+        console.log('[**]',dtuStatusMap)
+      },
+      error: (err) => {
+        console.error('[InfluxDB] 批量DTU查询失败：', err.message);
+        // 错误时返回默认值数组（纯数据）
+       const defaultResult = dtuNumberList.map(dtuNumber => ({
+          dtuNumber: dtuNumber,
+          time: '',
+          gateway_id: '',
+          region_code: '',
+          device_status: '未知',
+          pv_power: '0.00',
+          pv_voltage: '0.00',
+          output_voltage: '0.00',
+          output_current: '0.00',
+          dc_meter_power: '0.00'
+        }));
+        resolve(defaultResult);
+      },
+      complete: () => {
+        const finalResult = dtuNumberList.map(dtuNumber => {
+          const dtuStr = String(dtuNumber);//将数字转换成字符类型
+          console.log('[complete] 转换后的dtuStr:', dtuStr, '是否存在:', dtuStatusMap.has(dtuStr)); // 打印匹配结果
+          return dtuStatusMap.get(dtuStr) || {
+            dtuNumber: dtuNumber,
+            time: '',
+            gateway_id: '',
+            region_code: '',
+            device_status: '未知',
+            pv_power: '0.00',
+            pv_voltage: '0.00',
+            output_voltage: '0.00',
+            output_current: '0.00',
+            dc_meter_power: '0.00'
+          };
+        });
+        resolve(finalResult);
+      }
+    });
+  });
+}
+
 // 导出服务方法
 module.exports = {
   writePvData,
@@ -470,5 +584,6 @@ module.exports = {
   queryDeviceHistory,
   queryPvFullMetrics,
   statsRegionPvData,
-  queryAllDevicesLatestStatus
+  queryAllDevicesLatestStatus,
+  getBatchDtuLatestData
 };

@@ -17,7 +17,7 @@ import file from './support/file-const';
 import notice from './business/oa/notice-const';
 import loginLog from './support/login-log-const';
 import enterprise from './business/oa/enterprise-const';
-import { DEVICE_TYPE_ENUM, ENTERPRISE_TYPE_ENUM ,STATUS_ENUM, DTU_STATUS_ENUM} from './business/oa/enterprise-const';
+import { DEVICE_TYPE_ENUM, ENTERPRISE_TYPE_ENUM ,STATUS_ENUM, DTU_STATUS_ENUM, DTU_STATUS_STR_ENUM} from './business/oa/enterprise-const';
 import message from './business/message/message-const';
 import codeGeneratorConst from './support/code-generator-const';
 import changeLogConst from './support/change-log-const';
@@ -32,6 +32,7 @@ export default {
   ENTERPRISE_TYPE_ENUM, 
   DEVICE_TYPE_ENUM,
   DTU_STATUS_ENUM,
+  DTU_STATUS_STR_ENUM,
   STATUS_ENUM,
   ...loginLog,
   ...menu,

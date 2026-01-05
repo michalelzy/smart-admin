@@ -33,33 +33,33 @@ public class RoleEmployeeController {
     @Resource
     private RoleEmployeeService roleEmployeeService;
 
-    @Operation(summary = "查询某个角色下的员工列表  @author 卓大")
+    @Operation(summary = "查询某个角色下的员工列表  @author lqr")
     @PostMapping("/role/employee/queryEmployee")
     public ResponseDTO<PageResult<EmployeeVO>> queryEmployee(@Valid @RequestBody RoleEmployeeQueryForm roleEmployeeQueryForm) {
         return roleEmployeeService.queryEmployee(roleEmployeeQueryForm);
     }
 
-    @Operation(summary = "获取某个角色下的所有员工列表(无分页)  @author 卓大")
+    @Operation(summary = "获取某个角色下的所有员工列表(无分页)  @author lqr")
     @GetMapping("/role/employee/getAllEmployeeByRoleId/{roleId}")
     public ResponseDTO<List<EmployeeVO>> listAllEmployeeRoleId(@PathVariable Long roleId) {
         return ResponseDTO.ok(roleEmployeeService.getAllEmployeeByRoleId(roleId));
     }
 
-    @Operation(summary = "从角色成员列表中移除员工 @author 卓大")
+    @Operation(summary = "从角色成员列表中移除员工 @author lqr")
     @GetMapping("/role/employee/removeEmployee")
     @SaCheckPermission("system:role:employee:delete")
     public ResponseDTO<String> removeEmployee(Long employeeId, Long roleId) {
         return roleEmployeeService.removeRoleEmployee(employeeId, roleId);
     }
 
-    @Operation(summary = "从角色成员列表中批量移除员工 @author 卓大")
+    @Operation(summary = "从角色成员列表中批量移除员工 @author lqr")
     @PostMapping("/role/employee/batchRemoveRoleEmployee")
     @SaCheckPermission("system:role:employee:batch:delete")
     public ResponseDTO<String> batchRemoveEmployee(@Valid @RequestBody RoleEmployeeUpdateForm updateForm) {
         return roleEmployeeService.batchRemoveRoleEmployee(updateForm);
     }
 
-    @Operation(summary = "角色成员列表中批量添加员工 @author 卓大")
+    @Operation(summary = "角色成员列表中批量添加员工 @author lqr")
     @PostMapping("/role/employee/batchAddRoleEmployee")
     @SaCheckPermission("system:role:employee:add")
     public ResponseDTO<String> addEmployeeList(@Valid @RequestBody RoleEmployeeUpdateForm addForm) {

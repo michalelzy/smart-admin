@@ -41,13 +41,13 @@ public class AdminHelpDocController extends SupportBaseController {
     // --------------------- 帮助文档 【目录管理】 -------------------------
 
 
-    @Operation(summary = "帮助文档目录-添加 @author 卓大")
+    @Operation(summary = "帮助文档目录-添加 @author lqr")
     @PostMapping("/helpDoc/helpDocCatalog/add")
     public ResponseDTO<String> addHelpDocCatalog(@RequestBody @Valid HelpDocCatalogAddForm helpDocCatalogAddForm) {
         return helpDocCatalogService.add(helpDocCatalogAddForm);
     }
 
-    @Operation(summary = "帮助文档目录-更新 @author 卓大")
+    @Operation(summary = "帮助文档目录-更新 @author lqr")
     @PostMapping("/helpDoc/helpDocCatalog/update")
     public ResponseDTO<String> updateHelpDocCatalog(@RequestBody @Valid HelpDocCatalogUpdateForm helpDocCatalogUpdateForm) {
         return helpDocCatalogService.update(helpDocCatalogUpdateForm);

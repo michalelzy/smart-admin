@@ -42,7 +42,7 @@ public class LoginController {
 
     @NoNeedLogin
     @PostMapping("/login")
-    @Operation(summary = "登录 @author 卓大")
+    @Operation(summary = "登录 @author lqr")
     public ResponseDTO<LoginResultVO> login(@Valid @RequestBody LoginForm loginForm, HttpServletRequest request) {
         String ip = ServletUtil.getClientIP(request);
         String userAgent = ServletUtil.getHeaderIgnoreCase(request, RequestHeaderConst.USER_AGENT);
@@ -55,7 +55,7 @@ public class LoginController {
     // 前端通过 GET 方式访问这个地址时，会触发下面的方法执行。
     @GetMapping("/login/getLoginInfo")
     // 这是 Swagger/OpenAPI 的注解，用于接口文档生成：方便开发人员理解接口用途，也用于自动化 API 文档展示。
-    @Operation(summary = "获取登录结果信息  @author 卓大")
+    @Operation(summary = "获取登录结果信息  @author lqr")
     public ResponseDTO<LoginResultVO> getLoginInfo() {
         // ResponseDTO 是项目全局统一的响应结果封装类（包含状态码、消息、数据体）；
         // LoginResultVO 是具体的返回数据类型（VO = View Object，视图对象），封装了前端需要的登录结果数据（用户信息、菜单、权限等）；
@@ -73,13 +73,13 @@ public class LoginController {
         return ResponseDTO.ok(loginResult);
     }
 
-    @Operation(summary = "退出登录  @author 卓大")
+    @Operation(summary = "退出登录  @author lqr")
     @GetMapping("/login/logout")
     public ResponseDTO<String> logout() {
         return loginService.logout(SmartRequestUtil.getRequestUser());
     }
 
-    @Operation(summary = "获取验证码  @author 卓大")
+    @Operation(summary = "获取验证码  @author lqr")
     @GetMapping("/login/getCaptcha")
     @NoNeedLogin
     public ResponseDTO<CaptchaVO> getCaptcha() {
@@ -88,7 +88,7 @@ public class LoginController {
 
     @NoNeedLogin
     @GetMapping("/login/sendEmailCode/{loginName}")
-    @Operation(summary = "获取邮箱登录验证码 @author 卓大")
+    @Operation(summary = "获取邮箱登录验证码 @author lqr")
     public ResponseDTO<String> sendEmailCode(@PathVariable String loginName) {
         return loginService.sendEmailCode(loginName);
     }
@@ -96,7 +96,7 @@ public class LoginController {
 
     @NoNeedLogin
     @GetMapping("/login/getTwoFactorLoginFlag")
-    @Operation(summary = "获取双因子登录标识 @author 卓大")
+    @Operation(summary = "获取双因子登录标识 @author lqr")
     public ResponseDTO<Boolean> getTwoFactorLoginFlag() {
         // 双因子登录
         boolean twoFactorLoginEnabled = level3ProtectConfigService.isTwoFactorLoginEnabled();
