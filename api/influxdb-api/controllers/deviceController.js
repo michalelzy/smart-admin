@@ -79,7 +79,7 @@ const getBatchDtuLatestData = async (req, res) => {
    
     
     // 2. 调用Service层获取纯数据（无HTTP依赖）
-    const result = await influxService.getBatchDtuLatestData({
+    const result = await influxService.getTCPBatchDtuLatestRealData({
       dtuNumberList,
       limit,
       start: start,

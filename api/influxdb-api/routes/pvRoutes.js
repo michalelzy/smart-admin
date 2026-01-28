@@ -10,6 +10,37 @@ const deviceController = require('../controllers/deviceController');
 // 1. 写入光伏数据（POST）
 router.post('/data/write', pvController.writePvData);
 
+// 写入：【实时数据】
+router.post('/data/write-real-tcp', pvController.writePvRealDataByTcp);
+
+// 写入：【运行数据】
+router.post('/data/write-run-tcp', pvController.writePvRunDataByTcp);
+
+// 查询：单个DTU【实时数据】数据查询
+router.get('/tcp/real-data/latest', pvController.getTCPDtuLatestRealData);
+
+// 查询：单个DTU【运行数据】查询
+router.get('/tcp/run-data/latest', pvController.getTCPDtuLatestRunData);
+
+// 查询：年度【运行数据】带dtuNumber参数查询
+router.post('/tcp/run-data/yearly', pvController.getTCPDtuYearlyRunData);
+
+// 批量查询：批量DTU【实时数据】查询
+router.post('/tcp/real-data/batch', pvController.getTCPBatchDtuLatestRealData);
+
+// 批量查询：按照日期批量DTU【实时数据】查询
+router.post('/tcp/real-data/day/batch', pvController.getTCPBatchDtuLatestRealDataOnDay);
+
+// 批量查询：批量DTU【运行数据】
+router.post('/tcp/run-data/batch', pvController.getTCPBatchDtuLatestRunData);
+
+// 查询：查询光伏【曲线数据:实时数据】
+router.post('/tcp/real-data/single-day', pvController.getDtuDayFullData);
+
+// 查询：查询综合【日发电量总和】
+router.post('/tcp/batch/day-generate-power', pvController.getAllDtuSingleDayGeneratePower);
+
+
 // 2. 查询设备历史数据（GET）
 router.get('/data/history', pvController.queryDeviceHistory);
 
